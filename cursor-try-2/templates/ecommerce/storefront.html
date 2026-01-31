@@ -1,0 +1,194 @@
+{% extends "base.html" %}
+
+{% block title %}Storefront - BugHunter{% endblock %}
+
+{% block extra_css %}
+<style>
+.product-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: 1.5rem;
+    margin-top: 2rem;
+}
+
+.product-card {
+    background: white;
+    border-radius: 8px;
+    padding: 1rem;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    cursor: pointer;
+    transition: transform 0.2s;
+}
+
+.product-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+}
+
+.product-card img {
+    width: 100%;
+    height: 200px;
+    object-fit: cover;
+    border-radius: 4px;
+    margin-bottom: 1rem;
+}
+
+.filters {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 2rem;
+    flex-wrap: wrap;
+}
+
+.filter-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.filter-group label {
+    font-size: 0.875rem;
+    font-weight: 500;
+}
+
+.filter-group input,
+.filter-group select {
+    padding: 0.5rem;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="storefront">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+        <h1>Storefront</h1>
+        <a href="/shop-admin" class="btn btn-primary">Switch to Admin View</a>
+    </div>
+    
+    <div class="filters">
+        <div class="filter-group">
+            <label>Sort By</label>
+            <select id="sort-by">
+                <option value="newest">Newest</option>
+                <option value="oldest">Oldest</option>
+                <option value="price_low">Price: Low to High</option>
+                <option value="price_high">Price: High to Low</option>
+                <option value="name_asc">Name: A to Z</option>
+                <option value="name_desc">Name: Z to A</option>
+            </select>
+        </div>
+        
+        <div class="filter-group">
+            <label>Category</label>
+            <select id="category-filter" multiple style="min-width: 150px;">
+            </select>
+        </div>
+        
+        <div class="filter-group">
+            <label>Min Price</label>
+            <input type="number" id="price-min" step="0.01" min="0">
+        </div>
+        
+        <div class="filter-group">
+            <label>Max Price</label>
+            <input type="number" id="price-max" step="0.01" min="0">
+        </div>
+        
+        <div class="filter-group" style="justify-content: flex-end;">
+            <button class="btn btn-secondary" onclick="applyFilters()">Apply Filters</button>
+        </div>
+    </div>
+    
+    <div class="product-grid" id="product-grid">
+        <p>Loading products...</p>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', async () => {
+    // Wait for auth.js to load - check if fetchUser is available, if not wait a bit
+    let retries = 0;
+    const checkAuth = setInterval(() => {
+        if (typeof fetchUser === 'function') {
+            clearInterval(checkAuth);
+            (async () => {
+                const currentUser = await fetchUser();
+                if (currentUser && currentUser.active_role === 'admin') {
+                    await fetch('/api/auth/change_role', {
+                        method: 'POST',
+                        headers: getAuthHeaders()
+                    });
+                }
+                loadCategories();
+                loadProducts();
+            })();
+        } else if (retries++ > 10) {
+            clearInterval(checkAuth);
+            console.error('auth.js not loaded');
+            showAlert('Authentication error', 'error');
+        }
+    }, 100);
+});
+
+function loadCategories() {
+    fetch('/api/categories', {
+        headers: getAuthHeaders()
+    })
+    .then(res => res.json())
+    .then(categories => {
+        const select = document.getElementById('category-filter');
+        select.innerHTML = categories.map(cat => 
+            `<option value="${cat}">${cat}</option>`
+        ).join('');
+    });
+}
+
+function loadProducts() {
+    const params = new URLSearchParams();
+    params.append('sort', document.getElementById('sort-by').value);
+    
+    const categoryFilter = Array.from(document.getElementById('category-filter').selectedOptions).map(o => o.value);
+    if (categoryFilter.length > 0) {
+        params.append('category', categoryFilter[0]);
+    }
+    
+    const priceMin = document.getElementById('price-min').value;
+    const priceMax = document.getElementById('price-max').value;
+    if (priceMin) params.append('price_min', priceMin);
+    if (priceMax) params.append('price_max', priceMax);
+    
+    fetch(`/api/products?${params.toString()}`, {
+        headers: getAuthHeaders()
+    })
+    .then(res => res.json())
+    .then(products => {
+        const grid = document.getElementById('product-grid');
+        if (products.length === 0) {
+            grid.innerHTML = '<p>No products found</p>';
+            return;
+        }
+        
+        grid.innerHTML = products.map(product => `
+            <div class="product-card" onclick="window.location.href='/product/${product.id}'">
+                ${product.image_url ? `<img src="${product.image_url}" alt="${product.name}">` : '<div style="height: 200px; background: #eee; display: flex; align-items: center; justify-content: center; margin-bottom: 1rem;">No Image</div>'}
+                <h3>${product.name}</h3>
+                <p style="color: #666; margin: 0.5rem 0;">${product.description ? product.description.substring(0, 100) + '...' : ''}</p>
+                <p style="font-size: 1.25rem; font-weight: bold; color: #27ae60;">$${product.price}</p>
+                <p style="color: #999; font-size: 0.875rem;">Stock: ${product.quantity}</p>
+            </div>
+        `).join('');
+    })
+    .catch(err => {
+        console.error('Error loading products:', err);
+        showAlert('Failed to load products', 'error');
+    });
+}
+
+function applyFilters() {
+    loadProducts();
+}
+</script>
+{% endblock %}
+
