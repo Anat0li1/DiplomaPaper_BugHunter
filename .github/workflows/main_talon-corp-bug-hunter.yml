@@ -18,6 +18,12 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - name: Validate Azure deployment secrets (service principal flow)
+        run: |
+          echo "Checking required secrets..."
+          if [ -z "${{ secrets.AZURE_WEBAPP_NAME }}" ]; then echo "ERROR: AZURE_WEBAPP_NAME secret is not set"; exit 1; fi
+          if [ -z "${{ secrets.AZURE_CREDENTIALS }}" ]; then echo "ERROR: AZURE_CREDENTIALS secret is not set (service principal JSON)"; exit 1; fi
+
       - name: Set up Python
         uses: actions/setup-python@v4
         with:
@@ -44,11 +50,10 @@ jobs:
         with:
           creds: ${{ secrets.AZURE_CREDENTIALS }}
 
-      - name: 'Deploy to Azure Web App (publish profile)'
+      - name: 'Deploy to Azure Web App using service principal'
         uses: azure/webapps-deploy@v2
         with:
           app-name: ${{ secrets.AZURE_WEBAPP_NAME }}
-          publish-profile: ${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE }}
           package: cursor-try-2
 
   reindex:
