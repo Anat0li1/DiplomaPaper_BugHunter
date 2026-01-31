@@ -1,0 +1,237 @@
+{% extends "base.html" %}
+
+{% block title %}{% if bug_report_id %}Edit{% else %}New{% endif %} Bug Report - BugHunter{% endblock %}
+
+{% block content %}
+<div class="bug-report-form">
+    <h1>{% if bug_report_id %}Edit{% else %}Create New{% endif %} Bug Report</h1>
+    
+    <div class="card">
+        <form id="bug-report-form">
+            <div class="form-group">
+                <label>Title *</label>
+                <input type="text" id="title" name="title" required>
+            </div>
+            
+            <div class="form-group">
+                <label>Description</label>
+                <textarea id="description" name="description" rows="4"></textarea>
+            </div>
+            
+            <div class="form-group">
+                <label>Preconditions</label>
+                <textarea id="preconditions" name="preconditions" rows="3"></textarea>
+            </div>
+            
+            <div class="form-group">
+                <label>Postconditions</label>
+                <textarea id="postconditions" name="postconditions" rows="3"></textarea>
+            </div>
+            
+            <div class="form-group">
+                <label>Actual Result</label>
+                <textarea id="actual_result" name="actual_result" rows="3"></textarea>
+            </div>
+            
+            <div class="form-group">
+                <label>Expected Result</label>
+                <textarea id="expected_result" name="expected_result" rows="3"></textarea>
+            </div>
+            
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                <div class="form-group">
+                    <label>Severity</label>
+                    <select id="severity" name="severity">
+                        <option value="Critical">Critical</option>
+                        <option value="High">High</option>
+                        <option value="Medium" selected>Medium</option>
+                        <option value="Low">Low</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label>Priority</label>
+                    <select id="priority" name="priority">
+                        <option value="High">High</option>
+                        <option value="Medium" selected>Medium</option>
+                        <option value="Low">Low</option>
+                    </select>
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label>Status</label>
+                <select id="status" name="status">
+                    <option value="New" selected>New</option>
+                    <option value="In Progress">In Progress</option>
+                    <option value="Closed">Closed</option>
+                    <option value="Won't Fix">Won't Fix</option>
+                </select>
+            </div>
+            
+            <div class="form-group">
+                <label>System and Browser Info</label>
+                <input type="text" id="system_and_browser_inf" name="system_and_browser_inf">
+            </div>
+            
+            <div class="form-group">
+                <label>Version</label>
+                <input type="text" id="version" name="version">
+            </div>
+            
+            <div class="form-group">
+                <label>Environment</label>
+                <input type="text" id="environment" name="environment">
+            </div>
+            
+            <div class="form-group">
+                <label>Test Case Given ID</label>
+                <input type="text" id="test_case_given_id" name="test_case_given_id" placeholder="ID of related test case">
+            </div>
+            
+            <div class="form-group">
+                <label>Comments</label>
+                <textarea id="comments" name="comments" rows="3"></textarea>
+            </div>
+            
+            <div class="form-group">
+                <label>Reproducing Steps</label>
+                <div id="steps-container"></div>
+                <button type="button" class="btn btn-secondary" onclick="addStep()">Add Step</button>
+            </div>
+            
+            <div style="display: flex; gap: 1rem; margin-top: 2rem;">
+                <button type="submit" class="btn btn-primary">Save</button>
+                <a href="/bug-reports" class="btn btn-secondary">Cancel</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+let stepCount = 0;
+
+document.addEventListener('DOMContentLoaded', () => {
+    {% if bug_report_id %}
+    loadBugReport('{{ bug_report_id }}');
+    {% else %}
+    addStep();
+    {% endif %}
+});
+
+function addStep() {
+    stepCount++;
+    const container = document.getElementById('steps-container');
+    const stepDiv = document.createElement('div');
+    stepDiv.className = 'step-item';
+    stepDiv.style.cssText = 'display: flex; gap: 1rem; margin-bottom: 1rem; align-items: start;';
+    stepDiv.innerHTML = `
+        <input type="number" value="${stepCount}" min="1" class="step-number" style="width: 60px;" required>
+        <input type="text" placeholder="Step description" class="step-name" style="flex: 1;" required>
+        <button type="button" class="btn btn-danger" onclick="this.parentElement.remove()">Remove</button>
+    `;
+    container.appendChild(stepDiv);
+}
+
+function loadBugReport(id) {
+    fetch(`/api/bug-reports/${id}`, {
+        headers: getAuthHeaders()
+    })
+    .then(res => res.json())
+    .then(data => {
+        document.getElementById('title').value = data.title || '';
+        document.getElementById('description').value = data.description || '';
+        document.getElementById('preconditions').value = data.preconditions || '';
+        document.getElementById('postconditions').value = data.postconditions || '';
+        document.getElementById('actual_result').value = data.actual_result || '';
+        document.getElementById('expected_result').value = data.expected_result || '';
+        document.getElementById('severity').value = data.severity || 'Medium';
+        document.getElementById('priority').value = data.priority || 'Medium';
+        document.getElementById('status').value = data.status || 'New';
+        document.getElementById('system_and_browser_inf').value = data.system_and_browser_inf || '';
+        document.getElementById('version').value = data.version || '';
+        document.getElementById('environment').value = data.environment || '';
+        if (data.test_case_id) {
+            // Fetch test case to get given_id
+            fetch(`/api/test-cases/${data.test_case_id}`, {
+                headers: getAuthHeaders()
+            })
+            .then(res => res.json())
+            .then(tc => {
+                document.getElementById('test_case_given_id').value = tc.given_id || '';
+            })
+            .catch(() => {});
+        }
+        document.getElementById('comments').value = data.comments || '';
+        
+        document.getElementById('steps-container').innerHTML = '';
+        if (data.steps && data.steps.length > 0) {
+            data.steps.forEach(step => {
+                stepCount = Math.max(stepCount, step.number);
+                addStep();
+                const lastStep = document.querySelector('.step-item:last-child');
+                lastStep.querySelector('.step-number').value = step.number;
+                lastStep.querySelector('.step-name').value = step.step_name || '';
+            });
+        } else {
+            addStep();
+        }
+    })
+    .catch(err => {
+        console.error('Error loading bug report:', err);
+        showAlert('Failed to load bug report', 'error');
+    });
+}
+
+document.getElementById('bug-report-form').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    
+    const steps = Array.from(document.querySelectorAll('.step-item')).map((item, idx) => ({
+        number: parseInt(item.querySelector('.step-number').value) || (idx + 1),
+        step_name: item.querySelector('.step-name').value
+    }));
+    
+    const data = {
+        title: document.getElementById('title').value,
+        description: document.getElementById('description').value,
+        preconditions: document.getElementById('preconditions').value,
+        postconditions: document.getElementById('postconditions').value,
+        actual_result: document.getElementById('actual_result').value,
+        expected_result: document.getElementById('expected_result').value,
+        severity: document.getElementById('severity').value,
+        priority: document.getElementById('priority').value,
+        status: document.getElementById('status').value,
+        system_and_browser_inf: document.getElementById('system_and_browser_inf').value,
+        version: document.getElementById('version').value,
+        environment: document.getElementById('environment').value,
+        test_case_given_id: document.getElementById('test_case_given_id').value || null,
+        comments: document.getElementById('comments').value,
+        steps: steps
+    };
+    
+    const url = {% if bug_report_id %}'/api/bug-reports/{{ bug_report_id }}'{% else %}'/api/bug-reports'{% endif %};
+    const method = {% if bug_report_id %}'PUT'{% else %}'POST'{% endif %};
+    
+    try {
+        const response = await fetch(url, {
+            method: method,
+            headers: getAuthHeaders(),
+            body: JSON.stringify(data)
+        });
+        
+        if (response.ok) {
+            showAlert('Bug report saved successfully', 'success');
+            setTimeout(() => {
+                window.location.href = '/bug-reports';
+            }, 1000);
+        } else {
+            const error = await response.json();
+            showAlert(error.error || 'Failed to save bug report', 'error');
+        }
+    } catch (err) {
+        showAlert('Network error', 'error');
+    }
+});
+</script>
+{% endblock %}
+
