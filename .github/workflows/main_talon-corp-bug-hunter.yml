@@ -51,7 +51,7 @@ jobs:
         with:
           creds: ${{ secrets.AZURE_CREDENTIALS }}
 
-      - name: Debug: show Azure target web app and slots
+      - name: Debug - show Azure target web app and slots
         run: |
           echo "Azure account:"; az account show
           echo "Show webapp (if fails, list apps containing name):"
