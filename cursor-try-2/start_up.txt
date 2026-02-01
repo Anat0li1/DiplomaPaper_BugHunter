@@ -1,0 +1,12 @@
+# Recommended startup command for Azure Web App (Linux)
+#
+# This file contains the startup command that the GitHub Actions workflow will set
+# on the Azure Web App. Edit this line if you want a different command.
+#
+# Example for running the Flask app with gunicorn (recommended for production):
+#   gunicorn --workers 4 --bind 0.0.0.0:8000 app:app
+#
+# If your application module is different, update the "app:app" part to
+# point to the WSGI callable (module:callable).
+
+gunicorn --workers 4 --bind 0.0.0.0:8000 app:app
