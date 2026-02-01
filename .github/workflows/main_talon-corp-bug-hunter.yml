@@ -46,85 +46,29 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: 'Login to Azure using service principal'
-        uses: azure/login@v1
+      - name: Login to Azure
+        uses: azure/login@v2
         with:
           creds: ${{ secrets.AZURE_CREDENTIALS }}
 
-      - name: Debug - show Azure target web app and slots
+      - name: Set startup command from start_up.txt
+        working-directory: cursor-try-2
         run: |
-          echo "Azure account:"; az account show
-          echo "Show webapp (if fails, list apps containing name):"
-          az webapp show --name "${{ secrets.AZURE_WEBAPP_NAME }}" --resource-group "${{ secrets.AZURE_RESOURCE_GROUP }}" || az webapp list --query "[?contains(name, '${{ secrets.AZURE_WEBAPP_NAME }}')]" -o table
-          echo "List deployment slots for the app (if any):"
-          az webapp deployment slot list --name "${{ secrets.AZURE_WEBAPP_NAME }}" --resource-group "${{ secrets.AZURE_RESOURCE_GROUP }}" -o table
-
-      - name: Execute startup command on remote (Kudu)
-        env:
-          AZURE_RESOURCE_GROUP: ${{ secrets.AZURE_RESOURCE_GROUP }}
-          AZURE_WEBAPP_NAME: ${{ secrets.AZURE_WEBAPP_NAME }}
-        run: |
-          if [ -f cursor-try-2/start_up.txt ]; then
-            startup_cmd=$(cat cursor-try-2/start_up.txt)
-            echo "Will execute startup command on remote app: $startup_cmd"
-
-            # Obtain publishing credentials (username/password) via Azure CLI
-            publish_user=$(az webapp deployment list-publishing-credentials --name "$AZURE_WEBAPP_NAME" --resource-group "$AZURE_RESOURCE_GROUP" --query publishingUserName -o tsv)
-            publish_pass=$(az webapp deployment list-publishing-credentials --name "$AZURE_WEBAPP_NAME" --resource-group "$AZURE_RESOURCE_GROUP" --query publishingPassword -o tsv)
-
-            if [ -z "$publish_user" ] || [ -z "$publish_pass" ]; then
-              echo "Failed to obtain publishing credentials. Ensure the service principal has appropriate permissions."; exit 1
-            fi
-
-            kudu_url="https://${AZURE_WEBAPP_NAME}.scm.azurewebsites.net/api/command"
-            echo "Executing via Kudu: $kudu_url"
-
-            # Execute the command via Kudu API
-            curl -fsS -u "$publish_user:$publish_pass" -H "Content-Type: application/json" -d "{\"command\": \"$startup_cmd\"}" "$kudu_url" || true
-          else
-            echo "No cursor-try-2/start_up.txt found; skipping remote execution."
+          if [ ! -f start_up.txt ]; then
+            echo "start_up.txt not found"; exit 1
           fi
 
-      - name: 'Deploy to Azure Web App using service principal'
+          STARTUP_CMD=$(cat start_up.txt)
+          echo "Setting startup command:"
+          echo "$STARTUP_CMD"
+
+          az webapp config set \
+            --resource-group "${{ secrets.AZURE_RESOURCE_GROUP }}" \
+            --name "${{ secrets.AZURE_WEBAPP_NAME }}" \
+            --startup-file "$STARTUP_CMD"
+
+      - name: Deploy to Azure Web App
         uses: azure/webapps-deploy@v2
         with:
           app-name: ${{ secrets.AZURE_WEBAPP_NAME }}
           package: cursor-try-2
-
-  # reindex:
-  #   name: Reindex PDFs (RAG)
-  #   needs: deploy
-  #   runs-on: ubuntu-latest
-  #   environment: production
-  #   defaults:
-  #     run:
-  #       working-directory: cursor-try-2
-  #   steps:
-  #     - uses: actions/checkout@v4
-
-  #     - name: Set up Python
-  #       uses: actions/setup-python@v4
-  #       with:
-  #         python-version: '3.14'
-
-  #     - name: Install dependencies
-  #       run: |
-  #         python -m pip install --upgrade pip
-  #         pip install -r requirements.txt
-
-  #     - name: Reindex PDFs
-  #       env:
-  #         OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
-  #         AZURE_OPENAI_ENDPOINT: ${{ secrets.AZURE_OPENAI_ENDPOINT }}
-  #         AZURE_OPENAI_API_KEY: ${{ secrets.AZURE_OPENAI_API_KEY }}
-  #         AZURE_OPENAI_EMBEDDING_DEPLOYMENT: ${{ secrets.AZURE_OPENAI_EMBEDDING_DEPLOYMENT }}
-  #         AZURE_OPENAI_API_VERSION: ${{ secrets.AZURE_OPENAI_API_VERSION }}
-  #         AZURE_SEARCH_ENDPOINT: ${{ secrets.AZURE_SEARCH_ENDPOINT }}
-  #         AZURE_SEARCH_API_KEY: ${{ secrets.AZURE_SEARCH_API_KEY }}
-  #         AZURE_SEARCH_INDEX: ${{ secrets.AZURE_SEARCH_INDEX }}
-  #       run: |
-  #         # run the check script (non-fatal)
-  #         python scripts/check_openai_client.py || true
-
-  #         # Run indexer against repository data/pdfs folder
-  #         python scripts/ai_indexer.py --index-folder data/pdfs
