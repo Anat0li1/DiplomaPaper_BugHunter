@@ -1,0 +1,207 @@
+{% extends "base.html" %}
+
+{% block title %}{% if test_case_id %}Редагування{% else %}Новий{% endif %} тест-кейс - Портал якості{% endblock %}
+
+{% block content %}
+<div class="test-case-form">
+    <h1>{% if test_case_id %}Редагувати{% else %}Створити{% endif %} тест-кейс</h1>
+    
+    <div class="card">
+        <form id="test-case-form">
+            <div class="form-group">
+                <label>Зовнішній ID</label>
+                <input type="text" id="given_id" name="given_id" placeholder="Необовʼязковий власний ID">
+            </div>
+            
+            <div class="form-group">
+                <label>Група застосунку</label>
+                <input type="text" id="application_group" name="application_group">
+            </div>
+            
+            <div class="form-group">
+                <label>Назва *</label>
+                <input type="text" id="title" name="title" required>
+            </div>
+            
+            <div class="form-group">
+                <label>Опис</label>
+                <textarea id="description" name="description" rows="4"></textarea>
+            </div>
+            
+            <div class="form-group">
+                <label>Пріоритет</label>
+                <select id="priority" name="priority">
+                    <option value="1">Високий</option>
+                    <option value="2" selected>Середній</option>
+                    <option value="3">Низький</option>
+                </select>
+            </div>
+            
+            <div class="form-group">
+                <label>Передумови</label>
+                <textarea id="preconditions" name="preconditions" rows="3"></textarea>
+            </div>
+            
+            <div class="form-group">
+                <label>Післяумови</label>
+                <textarea id="postconditions" name="postconditions" rows="3"></textarea>
+            </div>
+            
+            <div class="form-group">
+                <label>Версія</label>
+                <input type="text" id="version" name="version">
+            </div>
+            
+            <div class="form-group">
+                <label>Середовище</label>
+                <input type="text" id="environment" name="environment">
+            </div>
+            
+            <div class="form-group">
+                <label>Коментарі</label>
+                <textarea id="comments" name="comments" rows="3"></textarea>
+            </div>
+            
+            <div class="form-group">
+                <label>Кроки тесту</label>
+                <div id="steps-container"></div>
+                <button type="button" class="btn btn-secondary" onclick="addStep()">Додати крок</button>
+                <button type="button" class="btn btn-secondary" onclick="renumberSteps()">Перенумерувати</button>
+            </div>
+            
+            <div style="display: flex; gap: 1rem; margin-top: 2rem;">
+                <button type="submit" class="btn btn-primary">Зберегти</button>
+                <a href="/test-cases" class="btn btn-secondary">Скасувати</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+let stepCount = 0;
+
+document.addEventListener('DOMContentLoaded', () => {
+    {% if test_case_id %}
+    loadTestCase('{{ test_case_id }}');
+    {% else %}
+    addStep();
+    {% endif %}
+});
+
+function addStep() {
+    stepCount++;
+    const container = document.getElementById('steps-container');
+    const stepDiv = document.createElement('div');
+    stepDiv.className = 'step-item';
+    stepDiv.style.cssText = 'display: flex; gap: 1rem; margin-bottom: 1rem; align-items: start;';
+    stepDiv.innerHTML = `
+        <input type="number" value="${stepCount}" min="1" class="step-number" style="width: 60px;" required>
+        <input type="text" placeholder="Назва кроку" class="step-name" style="flex: 1;" required>
+        <input type="text" placeholder="Тестові дані" class="step-data" style="flex: 1;">
+        <input type="text" placeholder="Очікуваний результат" class="step-result" style="flex: 1;">
+        <button type="button" class="btn btn-danger" onclick="removeStep(this)">Видалити</button>
+    `;
+    container.appendChild(stepDiv);
+    renumberSteps();
+}
+
+function removeStep(button) {
+    button.parentElement.remove();
+    renumberSteps();
+}
+
+function renumberSteps() {
+    const steps = document.querySelectorAll('.step-item');
+    steps.forEach((step, index) => {
+        step.querySelector('.step-number').value = index + 1;
+    });
+    stepCount = steps.length;
+}
+
+function loadTestCase(id) {
+    fetch(`/api/test-cases/${id}`, {
+        headers: getAuthHeaders()
+    })
+    .then(res => res.json())
+    .then(data => {
+        document.getElementById('given_id').value = data.given_id || '';
+        document.getElementById('application_group').value = data.application_group || '';
+        document.getElementById('title').value = data.title || '';
+        document.getElementById('description').value = data.description || '';
+        document.getElementById('priority').value = data.priority || 2;
+        document.getElementById('preconditions').value = data.preconditions || '';
+        document.getElementById('postconditions').value = data.postconditions || '';
+        document.getElementById('version').value = data.version || '';
+        document.getElementById('environment').value = data.environment || '';
+        document.getElementById('comments').value = data.comments || '';
+        
+        document.getElementById('steps-container').innerHTML = '';
+        if (data.steps && data.steps.length > 0) {
+            data.steps.forEach(step => {
+                stepCount = Math.max(stepCount, step.number);
+                addStep();
+                const lastStep = document.querySelector('.step-item:last-child');
+                lastStep.querySelector('.step-number').value = step.number;
+                lastStep.querySelector('.step-name').value = step.step_name || '';
+                lastStep.querySelector('.step-data').value = step.test_data || '';
+                lastStep.querySelector('.step-result').value = step.expected_result || '';
+            });
+        } else {
+            addStep();
+        }
+    })
+    .catch(err => {
+        console.error('Помилка завантаження тест-кейсу:', err);
+        showAlert('Не вдалося завантажити тест-кейс', 'error');
+    });
+}
+
+document.getElementById('test-case-form').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    
+    const steps = Array.from(document.querySelectorAll('.step-item')).map((item, idx) => ({
+        number: parseInt(item.querySelector('.step-number').value) || (idx + 1),
+        step_name: item.querySelector('.step-name').value,
+        test_data: item.querySelector('.step-data').value,
+        expected_result: item.querySelector('.step-result').value
+    }));
+    
+    const data = {
+        given_id: document.getElementById('given_id').value || null,
+        application_group: document.getElementById('application_group').value,
+        title: document.getElementById('title').value,
+        description: document.getElementById('description').value,
+        priority: parseInt(document.getElementById('priority').value),
+        preconditions: document.getElementById('preconditions').value,
+        postconditions: document.getElementById('postconditions').value,
+        version: document.getElementById('version').value,
+        environment: document.getElementById('environment').value,
+        comments: document.getElementById('comments').value,
+        steps: steps
+    };
+    
+    const url = {% if test_case_id %}'/api/test-cases/{{ test_case_id }}'{% else %}'/api/test-cases'{% endif %};
+    const method = {% if test_case_id %}'PUT'{% else %}'POST'{% endif %};
+    
+    try {
+        const response = await fetch(url, {
+            method: method,
+            headers: getAuthHeaders(),
+            body: JSON.stringify(data)
+        });
+        
+        if (response.ok) {
+            showAlert('Тест-кейс успішно збережено', 'success');
+            setTimeout(() => {
+                window.location.href = '/test-cases';
+            }, 1000);
+        } else {
+            const error = await response.json();
+            showAlert(error.error || 'Не вдалося зберегти тест-кейс', 'error');
+        }
+    } catch (err) {
+        showAlert('Помилка мережі', 'error');
+    }
+});
+</script>
+{% endblock %}

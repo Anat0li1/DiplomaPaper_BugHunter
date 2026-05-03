@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+
+{% block title %}Тестовий магазин - Портал якості{% endblock %}
+
+{% block content %}
+<div class="card">
+    <h1>Завантаження магазину...</h1>
+    <p id="entry-status">Checking if you already have a store configured.</p>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', async () => {
+    try {
+        const res = await fetch('/api/shop', { headers: getAuthHeaders() });
+        if (res.ok) {
+            window.location.href = '/storefront';
+            return;
+        }
+        if (res.status === 404) {
+            window.location.href = '/create-shop';
+            return;
+        }
+        document.getElementById('entry-status').textContent = 'Unable to load shop information. Please try again.';
+    } catch (error) {
+        console.error('Помилка перевірки магазину:', error);
+        document.getElementById('entry-status').textContent = 'Unable to load shop information. Please try again.';
+    }
+});
+</script>
+{% endblock %}
+
+
+

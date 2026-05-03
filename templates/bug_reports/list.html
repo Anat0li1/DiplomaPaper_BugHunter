@@ -1,0 +1,87 @@
+{% extends "base.html" %}
+
+{% block title %}Баг-репорти - Портал якості{% endblock %}
+
+{% block content %}
+<div class="bug-reports-list">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+        <h1>Баг-репорти</h1>
+        <a href="/bug-reports/new" class="btn btn-primary">Створити баг-репорт</a>
+    </div>
+    
+    <div class="card">
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Назва</th>
+                    <th>Серйозність</th>
+                    <th>Пріоритет</th>
+                    <th>Статус</th>
+                    <th>Дії</th>
+                </tr>
+            </thead>
+            <tbody id="bug-reports-table">
+                <tr><td colspan="6">Завантаження...</td></tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    loadBugReports();
+});
+
+function loadBugReports() {
+    fetch('/api/bug-reports', {
+        headers: getAuthHeaders()
+    })
+    .then(res => res.json())
+    .then(data => {
+        const tbody = document.getElementById('bug-reports-table');
+        if (data.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="6">Баг-репортів не знайдено</td></tr>';
+            return;
+        }
+        
+        tbody.innerHTML = data.map(br => `
+            <tr>
+                <td>${br.given_id}</td>
+                <td>${br.title}</td>
+                <td>${br.severity}</td>
+                <td>${br.priority}</td>
+                <td>${br.status}</td>
+                <td>
+                    <a href="/bug-reports/view/${br.id}" class="btn btn-secondary" style="padding: 0.25rem 0.75rem; font-size: 0.875rem;">Переглянути</a>
+                    <a href="/bug-reports/edit/${br.id}" class="btn btn-primary" style="padding: 0.25rem 0.75rem; font-size: 0.875rem;">Редагувати</a>
+                    <button onclick="deleteBugReport('${br.id}')" class="btn btn-danger" style="padding: 0.25rem 0.75rem; font-size: 0.875rem;">Видалити</button>
+                </td>
+            </tr>
+        `).join('');
+    })
+    .catch(err => {
+        console.error('Помилка завантаження баг-репортів:', err);
+        showAlert('Не вдалося завантажити баг-репорти', 'error');
+    });
+}
+
+function deleteBugReport(id) {
+    if (!confirm('Видалити цей баг-репорт?')) return;
+    
+    fetch(`/api/bug-reports/${id}`, {
+        method: 'DELETE',
+        headers: getAuthHeaders()
+    })
+    .then(res => {
+        if (res.ok) {
+            showAlert('Баг-репорт видалено', 'success');
+            loadBugReports();
+        } else {
+            showAlert('Не вдалося видалити баг-репорт', 'error');
+        }
+    });
+}
+</script>
+{% endblock %}
+

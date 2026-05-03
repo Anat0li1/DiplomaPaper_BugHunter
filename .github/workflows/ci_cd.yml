@@ -1,0 +1,109 @@
+name: CI/CD - build, migrations, deploy
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+  id-token: write
+
+jobs:
+  checks:
+    name: Перевірки коду та міграцій
+    runs-on: ubuntu-latest
+
+    services:
+      postgres:
+        image: postgres:15
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: quality_portal_test
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres -d quality_portal_test"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    env:
+      DATABASE_URL: postgresql://postgres:postgres@localhost:5432/quality_portal_test
+      FLASK_APP: app.py
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Налаштувати Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Встановити залежності
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Перевірити синтаксис Python
+        run: python -m compileall app.py blueprints models.py scripts utils.py
+
+      - name: Застосувати міграції бази
+        run: alembic upgrade head
+
+      - name: Перевірити, що моделі синхронізовані з міграціями
+        run: |
+          alembic check
+
+      - name: Запустити тести
+        run: |
+          if [ -f pytest.ini ] || [ -d tests ]; then
+            pytest -q
+          else
+            echo "Тести не знайдено"
+          fi
+
+  deploy:
+    name: Деплой в Azure Web App
+    needs: checks
+    if: github.event_name == 'push'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Перевірити секрети Azure
+        run: |
+          if [ -z "${{ secrets.AZURE_WEBAPP_NAME }}" ]; then echo "AZURE_WEBAPP_NAME не налаштовано"; exit 1; fi
+          if [ -z "${{ secrets.AZURE_CREDENTIALS }}" ]; then echo "AZURE_CREDENTIALS не налаштовано"; exit 1; fi
+          if [ -z "${{ secrets.AZURE_RESOURCE_GROUP }}" ]; then echo "AZURE_RESOURCE_GROUP не налаштовано"; exit 1; fi
+
+      - name: Увійти в Azure
+        uses: azure/login@v1
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+      - name: Налаштувати Python для міграцій
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Встановити залежності
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Застосувати міграції production-бази
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          FLASK_APP: app.py
+        run: |
+          if [ -z "$DATABASE_URL" ]; then echo "DATABASE_URL не налаштовано"; exit 1; fi
+          alembic upgrade head
+
+      - name: Деплой застосунку
+        uses: azure/webapps-deploy@v2
+        with:
+          app-name: ${{ secrets.AZURE_WEBAPP_NAME }}
+          package: .

@@ -1,0 +1,10 @@
+# Рекомендована startup-команда для Azure Web App на Linux.
+#
+# За потреби змініть команду нижче під конкретне середовище.
+#
+# Приклад запуску Flask через gunicorn:
+#   gunicorn --workers 4 --bind 0.0.0.0:8000 app:app
+#
+# Якщо модуль застосунку інший, оновіть частину "app:app".
+
+gunicorn --workers 4 --bind 0.0.0.0:8000 app:app

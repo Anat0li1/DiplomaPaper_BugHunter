@@ -1,0 +1,68 @@
+{% extends "base.html" %}
+
+{% block title %}Перегляд тест-кейсу - Портал якості{% endblock %}
+
+{% block content %}
+<div class="test-case-view">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+        <h1>Деталі тест-кейсу</h1>
+        <div>
+            <a href="/test-cases/edit/{{ test_case_id }}" class="btn btn-primary">Редагувати</a>
+            <a href="/test-cases" class="btn btn-secondary">До списку</a>
+        </div>
+    </div>
+    
+    <div class="card" id="test-case-details">
+        <p>Завантаження...</p>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    loadTestCase('{{ test_case_id }}');
+});
+
+function loadTestCase(id) {
+    fetch(`/api/test-cases/${id}`, {
+        headers: getAuthHeaders()
+    })
+    .then(res => res.json())
+    .then(data => {
+        const container = document.getElementById('test-case-details');
+        container.innerHTML = `
+            <h2>${data.title}</h2>
+            <div style="margin-top: 1.5rem;">
+                <p><strong>ID:</strong> ${data.given_id}</p>
+                <p><strong>Група застосунку:</strong> ${data.application_group || '-'}</p>
+                <p><strong>Пріоритет:</strong> ${['', 'Високий', 'Середній', 'Низький'][data.priority] || 'Середній'}</p>
+                <p><strong>Версія:</strong> ${data.version || '-'}</p>
+                <p><strong>Середовище:</strong> ${data.environment || '-'}</p>
+                <p><strong>Опис:</strong></p>
+                <p>${data.description || '-'}</p>
+                <p><strong>Передумови:</strong></p>
+                <p>${data.preconditions || '-'}</p>
+                <p><strong>Післяумови:</strong></p>
+                <p>${data.postconditions || '-'}</p>
+                <p><strong>Коментарі:</strong></p>
+                <p>${data.comments || '-'}</p>
+                <h3 style="margin-top: 2rem;">Кроки тесту</h3>
+                <ol>
+                    ${data.steps.map(step => `
+                        <li style="margin-bottom: 1rem;">
+                            <strong>${step.step_name}</strong>
+                            ${step.test_data ? `<br><em>Тестові дані:</em> ${step.test_data}` : ''}
+                            ${step.expected_result ? `<br><em>Очікуваний результат:</em> ${step.expected_result}` : ''}
+                        </li>
+                    `).join('')}
+                </ol>
+            </div>
+        `;
+    })
+    .catch(err => {
+        console.error('Помилка завантаження тест-кейсу:', err);
+        showAlert('Не вдалося завантажити тест-кейс', 'error');
+    });
+}
+</script>
+{% endblock %}
+

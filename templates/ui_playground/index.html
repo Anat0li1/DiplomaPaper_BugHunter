@@ -1,0 +1,340 @@
+{% extends "base.html" %}
+
+{% block title %}UI-полігон - Портал якості{% endblock %}
+
+{% block extra_css %}
+<style>
+.playground-section {
+    margin-bottom: 3rem;
+    padding: 2rem;
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.playground-section h2 {
+    margin-bottom: 1.5rem;
+    color: #2c3e50;
+    border-bottom: 2px solid #3498db;
+    padding-bottom: 0.5rem;
+}
+
+.element-group {
+    margin-bottom: 2rem;
+}
+
+.element-group label {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-weight: 500;
+}
+
+.hidden-element {
+    display: none;
+}
+
+.delayed-element {
+    opacity: 0;
+    transition: opacity 0.5s;
+}
+
+.delayed-element.visible {
+    opacity: 1;
+}
+
+iframe-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 1rem;
+    margin-top: 1rem;
+}
+
+iframe {
+    width: 100%;
+    height: 300px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+}
+
+.sortable-table {
+    width: 100%;
+    margin-top: 1rem;
+}
+
+.sortable-table th {
+    cursor: pointer;
+    user-select: none;
+}
+
+.sortable-table th:hover {
+    background-color: #e8f4f8;
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="ui-playground">
+    <h1>UI-полігон для автоматизації</h1>
+    <p>Набір UI-елементів для тренування автоматизованого тестування</p>
+    
+    <!-- Text fields -->
+    <div class="playground-section">
+        <h2>Текстові поля</h2>
+        <div class="element-group">
+            <label>Звичайне текстове поле</label>
+            <input type="text" placeholder="Введіть текст" class="form-control">
+        </div>
+        <div class="element-group">
+            <label>Вимкнене текстове поле</label>
+            <input type="text" value="Вимкнене поле" disabled>
+        </div>
+        <div class="element-group">
+            <label>Попередньо заповнене поле</label>
+            <input type="text" value="Це поле вже заповнене">
+        </div>
+        <div class="element-group">
+            <label>Приховане текстове поле</label>
+            <input type="text" id="hidden-field" class="hidden-element" value="Приховане значення">
+            <button class="btn btn-secondary" onclick="toggleHidden()">Перемкнути поле</button>
+        </div>
+        <div class="element-group">
+            <label>Поле із затримкою появи</label>
+            <input type="text" id="delayed-field" class="delayed-element" placeholder="Це поле зʼявиться через 5 секунд">
+        </div>
+    </div>
+    
+    <!-- Buttons -->
+    <div class="playground-section">
+        <h2>Кнопки</h2>
+        <div class="element-group">
+            <button class="btn btn-primary" onclick="buttonClicked('Звичайна кнопка')">Звичайна кнопка</button>
+            <button class="btn btn-secondary" disabled>Вимкнена кнопка</button>
+            <button class="btn btn-success" id="delayed-btn" class="delayed-element" onclick="buttonClicked('Кнопка із затримкою')">Кнопка із затримкою (5 с)</button>
+            <button class="btn btn-danger" id="hidden-btn" style="display: none;" onclick="buttonClicked('Прихована кнопка')">Прихована кнопка</button>
+            <button class="btn btn-secondary" onclick="toggleButton()">Перемкнути приховану кнопку</button>
+        </div>
+        <div id="button-clicks" style="margin-top: 1rem; padding: 1rem; background: #f0f0f0; border-radius: 4px;">
+            <strong>Кліки по кнопках:</strong> <span id="click-count">0</span>
+        </div>
+    </div>
+    
+    <!-- Checkboxes -->
+    <div class="playground-section">
+        <h2>Чекбокси</h2>
+        <div class="element-group">
+            <label><input type="checkbox" value="option1"> Опція 1</label>
+            <label><input type="checkbox" value="option2"> Опція 2</label>
+            <label><input type="checkbox" value="option3"> Опція 3</label>
+        </div>
+        <div class="element-group">
+            <label><input type="checkbox" id="single-checkbox"> Один чекбокс</label>
+        </div>
+    </div>
+    
+    <!-- Radio groups -->
+    <div class="playground-section">
+        <h2>Радіогрупи</h2>
+        <div class="element-group">
+            <label><input type="radio" name="radio-group" value="option1"> Опція 1</label>
+            <label><input type="radio" name="radio-group" value="option2"> Опція 2</label>
+            <label><input type="radio" name="radio-group" value="option3"> Опція 3</label>
+        </div>
+    </div>
+    
+    <!-- Dropdowns -->
+    <div class="playground-section">
+        <h2>Випадні списки</h2>
+        <div class="element-group">
+            <label>Простий список</label>
+            <select>
+                <option>Опція 1</option>
+                <option>Опція 2</option>
+                <option>Опція 3</option>
+            </select>
+        </div>
+        <div class="element-group">
+            <label>Розширений список із групами</label>
+            <select>
+                <optgroup label="Група 1">
+                    <option>Елемент 1.1</option>
+                    <option>Елемент 1.2</option>
+                </optgroup>
+                <optgroup label="Група 2">
+                    <option>Елемент 2.1</option>
+                    <option>Елемент 2.2</option>
+                </optgroup>
+            </select>
+        </div>
+    </div>
+    
+    <!-- Multi-select -->
+    <div class="playground-section">
+        <h2>Множинний вибір</h2>
+        <div class="element-group">
+            <label>Список множинного вибору</label>
+            <select multiple style="height: 100px;">
+                <option>Опція 1</option>
+                <option>Опція 2</option>
+                <option>Опція 3</option>
+                <option>Опція 4</option>
+                <option>Опція 5</option>
+            </select>
+        </div>
+    </div>
+    
+    <!-- iFrames -->
+    <div class="playground-section">
+            <h2>iFrame</h2>
+        <div class="iframe-container">
+            <div>
+                <h3>Приклад 1: зовнішня сторінка</h3>
+                <iframe src="https://example.com"></iframe>
+            </div>
+            <div>
+                <h3>Приклад 2: інша зовнішня сторінка</h3>
+                <iframe src="https://httpbin.org/html"></iframe>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Data tables -->
+    <div class="playground-section">
+        <h2>Динамічні таблиці із сортуванням</h2>
+        <table class="table sortable-table" id="data-table">
+            <thead>
+                <tr>
+                    <th onclick="sortTable(0)">Імʼя ↕</th>
+                    <th onclick="sortTable(1)">Вік ↕</th>
+                    <th onclick="sortTable(2)">Місто ↕</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr><td>Аліса</td><td>25</td><td>Нью-Йорк</td></tr>
+                <tr><td>Богдан</td><td>30</td><td>Лондон</td></tr>
+                <tr><td>Максим</td><td>22</td><td>Токіо</td></tr>
+                <tr><td>Діана</td><td>28</td><td>Париж</td></tr>
+            </tbody>
+        </table>
+    </div>
+    
+    <!-- Modal dialogs -->
+    <div class="playground-section">
+        <h2>Модальні вікна</h2>
+        <button class="btn btn-primary" onclick="showModal()">Відкрити модальне вікно</button>
+        <div id="test-modal" class="modal">
+            <div class="modal-content">
+                <h2>Тестове модальне вікно</h2>
+                <p>Це модальне вікно для тестування.</p>
+                <button class="btn btn-secondary" onclick="closeModal()">Закрити</button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Sliders -->
+    <div class="playground-section">
+        <h2>Слайдери</h2>
+        <div class="element-group">
+            <label>Слайдер діапазону: <span id="slider-value">50</span></label>
+            <input type="range" min="0" max="100" value="50" oninput="document.getElementById('slider-value').textContent = this.value">
+        </div>
+    </div>
+    
+    <!-- Date pickers -->
+    <div class="playground-section">
+        <h2>Вибір дати й часу</h2>
+        <div class="element-group">
+            <label>Вибір дати</label>
+            <input type="date">
+        </div>
+        <div class="element-group">
+            <label>Вибір часу</label>
+            <input type="time">
+        </div>
+        <div class="element-group">
+            <label>Вибір дати й часу</label>
+            <input type="datetime-local">
+        </div>
+    </div>
+    
+    <!-- Other components -->
+    <div class="playground-section">
+        <h2>Інші UI-компоненти</h2>
+        <div class="element-group">
+            <label>Завантаження файлу</label>
+            <input type="file">
+        </div>
+        <div class="element-group">
+            <label>Вибір кольору</label>
+            <input type="color" value="#3498db">
+        </div>
+        <div class="element-group">
+            <label>Індикатор прогресу</label>
+            <progress value="60" max="100">60%</progress>
+        </div>
+        <div class="element-group">
+            <label>Багаторядкове поле</label>
+            <textarea rows="4" placeholder="Введіть багаторядковий текст"></textarea>
+        </div>
+    </div>
+</div>
+
+<script>
+let clickCount = 0;
+
+function buttonClicked(buttonName) {
+    clickCount++;
+    document.getElementById('click-count').textContent = clickCount;
+    console.log(`Кнопку натиснуто: ${buttonName} (усього: ${clickCount})`);
+    showAlert(`${buttonName}: натиснуто`, 'success');
+}
+
+// Delayed appearance.
+setTimeout(() => {
+    document.getElementById('delayed-field').classList.add('visible');
+    document.getElementById('delayed-btn').classList.add('visible');
+}, 5000);
+
+function toggleHidden() {
+    const field = document.getElementById('hidden-field');
+    field.classList.toggle('hidden-element');
+}
+
+function toggleButton() {
+    const btn = document.getElementById('hidden-btn');
+    btn.style.display = btn.style.display === 'none' ? 'inline-block' : 'none';
+}
+
+function showModal() {
+    document.getElementById('test-modal').classList.add('active');
+}
+
+function closeModal() {
+    document.getElementById('test-modal').classList.remove('active');
+}
+
+let sortDirection = {};
+function sortTable(columnIndex) {
+    const table = document.getElementById('data-table');
+    const tbody = table.querySelector('tbody');
+    const rows = Array.from(tbody.querySelectorAll('tr'));
+    
+    const direction = sortDirection[columnIndex] || 'asc';
+    sortDirection[columnIndex] = direction === 'asc' ? 'desc' : 'asc';
+    
+    rows.sort((a, b) => {
+        const aText = a.cells[columnIndex].textContent.trim();
+        const bText = b.cells[columnIndex].textContent.trim();
+        
+        if (columnIndex === 1) {
+            return direction === 'asc' ? aText - bText : bText - aText;
+        }
+        
+        return direction === 'asc' 
+            ? aText.localeCompare(bText)
+            : bText.localeCompare(aText);
+    });
+    
+    rows.forEach(row => tbody.appendChild(row));
+}
+</script>
+{% endblock %}

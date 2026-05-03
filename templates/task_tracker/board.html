@@ -1,0 +1,441 @@
+{% extends "base.html" %}
+
+{% block title %}Kanban-дошка - Портал якості{% endblock %}
+
+{% block extra_css %}
+<style>
+.kanban-board {
+    display: flex;
+    gap: 1.5rem;
+    overflow-x: auto;
+    padding: 1rem 0;
+}
+
+.kanban-column {
+    min-width: 300px;
+    background: #f5f5f5;
+    border-radius: 8px;
+    padding: 1rem;
+}
+
+.column-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 2px solid #ddd;
+}
+
+.task-card {
+    background: white;
+    padding: 1rem;
+    margin-bottom: 1rem;
+    border-radius: 4px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    cursor: move;
+}
+
+.task-card:hover {
+    box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+}
+
+.task-card.dragging {
+    opacity: 0.5;
+}
+
+.tasks-container {
+    min-height: 200px;
+}
+
+.drop-zone {
+    min-height: 100px;
+    border: 2px dashed #ddd;
+    border-radius: 4px;
+    margin-top: 1rem;
+    transition: all 0.2s;
+}
+
+.drop-zone.drag-over {
+    border-color: #3498db;
+    background-color: #e3f2fd;
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="kanban-view">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+        <h1 id="board-title">Завантаження...</h1>
+        <div>
+            <button class="btn btn-secondary" onclick="showCreateColumnModal()">Додати колонку</button>
+            <button class="btn btn-secondary" onclick="window.location.href='/task-tracker'">До дошок</button>
+        </div>
+    </div>
+    
+    <div class="kanban-board" id="kanban-board">
+        <p>Завантаження...</p>
+    </div>
+</div>
+
+<!-- Create column modal -->
+<div id="create-column-modal" class="modal">
+    <div class="modal-content">
+        <h2>Створити колонку</h2>
+        <form id="create-column-form">
+            <div class="form-group">
+                <label>Назва колонки *</label>
+                <input type="text" id="column-title" required>
+            </div>
+            <div style="display: flex; gap: 1rem; margin-top: 1rem;">
+                <button type="submit" class="btn btn-primary">Створити</button>
+                <button type="button" class="btn btn-secondary" onclick="closeCreateColumnModal()">Скасувати</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Task modal -->
+<div id="task-modal" class="modal">
+    <div class="modal-content">
+        <h2 id="task-modal-title">Створити задачу</h2>
+        <form id="task-form">
+            <input type="hidden" id="task-id">
+            <input type="hidden" id="task-column-id">
+            <div class="form-group">
+                <label>Назва *</label>
+                <input type="text" id="task-title" required>
+            </div>
+            <div class="form-group">
+                <label>Опис</label>
+                <textarea id="task-description" rows="3"></textarea>
+            </div>
+            <div class="form-group">
+                <label>Виконавець</label>
+                <input type="text" id="task-doer">
+            </div>
+            <div class="form-group">
+                <label>Початок</label>
+                <input type="datetime-local" id="task-start-time">
+            </div>
+            <div class="form-group">
+                <label>Завершення</label>
+                <input type="datetime-local" id="task-end-time">
+            </div>
+            <div class="form-group">
+                <label>Пріоритет</label>
+                <select id="task-priority">
+                    <option value="">Немає</option>
+                    <option value="High">Високий</option>
+                    <option value="Medium">Середній</option>
+                    <option value="Low">Низький</option>
+                </select>
+            </div>
+            <div style="display: flex; gap: 1rem; margin-top: 1rem;">
+                <button type="submit" class="btn btn-primary">Зберегти</button>
+                <button type="button" class="btn btn-secondary" onclick="closeTaskModal()">Скасувати</button>
+                <button type="button" class="btn btn-danger" id="delete-task-btn" style="display: none;" onclick="deleteTask()">Видалити</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+const boardId = '{{ board_id }}';
+let draggedTask = null;
+
+document.addEventListener('DOMContentLoaded', () => {
+    loadBoardTitle();
+    loadBoard();
+});
+
+function loadBoardTitle() {
+    fetch(`/api/boards/${boardId}`, {
+        headers: getAuthHeaders()
+    })
+    .then(res => res.json())
+    .then(board => {
+        document.getElementById('board-title').textContent = board.title;
+    });
+}
+
+function loadBoard() {
+    fetch(`/api/boards/${boardId}/columns`, {
+        headers: getAuthHeaders()
+    })
+    .then(res => res.json())
+    .then(columns => {
+        const board = document.getElementById('kanban-board');
+        board.innerHTML = columns.map(col => `
+            <div class="kanban-column" data-column-id="${col.id}">
+                <div class="column-header">
+                    <h3>${col.title}</h3>
+                    <div>
+                        <button class="btn btn-secondary" style="padding: 0.25rem 0.5rem; font-size: 0.75rem;" onclick="editColumn('${col.id}', '${col.title}')">Редагувати</button>
+                        <button class="btn btn-danger" style="padding: 0.25rem 0.5rem; font-size: 0.75rem;" onclick="deleteColumn('${col.id}')">Видалити</button>
+                    </div>
+                </div>
+                <button class="btn btn-primary" style="width: 100%; margin-bottom: 1rem;" onclick="showCreateTaskModal('${col.id}')">Додати задачу</button>
+                <div class="tasks-container" data-column-id="${col.id}">
+                    ${col.tasks.map(task => `
+                        <div class="task-card" draggable="true" ondragstart="drag(event)" data-task-id="${task.id}" onclick="editTask('${task.id}', '${col.id}')">
+                            <h4>${task.title}</h4>
+                            ${task.description ? `<p style="font-size: 0.875rem; color: #666;">${task.description}</p>` : ''}
+                            ${task.priority ? `<span style="font-size: 0.75rem; color: #e74c3c;">${task.priority}</span>` : ''}
+                        </div>
+                    `).join('')}
+                    <div class="drop-zone" ondrop="drop(event)" ondragover="allowDrop(event)" data-column-id="${col.id}">
+                        <p style="text-align: center; color: #999; padding: 1rem;">Перетягніть задачі сюди</p>
+                    </div>
+                </div>
+            </div>
+        `).join('');
+    });
+}
+
+function allowDrop(ev) {
+    ev.preventDefault();
+    ev.stopPropagation();
+    if (ev.currentTarget.classList.contains('drop-zone')) {
+        ev.currentTarget.classList.add('drag-over');
+    }
+}
+
+function drag(ev) {
+    draggedTask = ev.target.closest('.task-card');
+    if (draggedTask) {
+        draggedTask.classList.add('dragging');
+        ev.dataTransfer.effectAllowed = 'move';
+        ev.dataTransfer.setData('text/html', draggedTask.outerHTML);
+    }
+}
+
+function dragEnd(ev) {
+    if (draggedTask) {
+        draggedTask.classList.remove('dragging');
+    }
+    // Remove drag-over from all drop zones.
+    document.querySelectorAll('.drop-zone').forEach(zone => {
+        zone.classList.remove('drag-over');
+    });
+}
+
+function dragLeave(ev) {
+    ev.preventDefault();
+    if (ev.currentTarget.classList.contains('drop-zone')) {
+        ev.currentTarget.classList.remove('drag-over');
+    }
+}
+
+function drop(ev) {
+    ev.preventDefault();
+    ev.stopPropagation();
+    ev.currentTarget.classList.remove('drag-over');
+    
+    if (!draggedTask) return;
+    
+    const dropZone = ev.currentTarget;
+    const columnId = dropZone.dataset.columnId;
+    const taskId = draggedTask.dataset.taskId;
+    
+    if (!taskId || !columnId) {
+        draggedTask.classList.remove('dragging');
+        draggedTask = null;
+        return;
+    }
+    
+    // Get the original column to check if the task moved to another column.
+    const originalColumn = draggedTask.closest('.tasks-container');
+    const originalColumnId = originalColumn ? originalColumn.dataset.columnId : null;
+    
+    // If dropping in the same column, do nothing.
+    if (originalColumnId === columnId) {
+        draggedTask.classList.remove('dragging');
+        draggedTask = null;
+        return;
+    }
+    
+    // Update task column in the database.
+    fetch(`/api/tasks/${taskId}`, {
+        method: 'PUT',
+        headers: getAuthHeaders(),
+        body: JSON.stringify({ column_id: columnId })
+    })
+    .then(res => {
+        if (res.ok) {
+            // Move task card to the new column visually.
+            const newColumn = document.querySelector(`.tasks-container[data-column-id="${columnId}"]`);
+            if (newColumn && newColumn !== originalColumn) {
+                const dropZone = newColumn.querySelector('.drop-zone');
+                if (dropZone) {
+                    newColumn.insertBefore(draggedTask, dropZone);
+                } else {
+                    newColumn.appendChild(draggedTask);
+                }
+            }
+            draggedTask.classList.remove('dragging');
+            draggedTask = null;
+        } else {
+            console.error('Не вдалося оновити задачу');
+            showAlert('Не вдалося перемістити задачу', 'error');
+            draggedTask.classList.remove('dragging');
+            draggedTask = null;
+            loadBoard();
+        }
+    })
+    .catch(err => {
+        console.error('Помилка переміщення задачі:', err);
+        showAlert('Не вдалося перемістити задачу', 'error');
+        draggedTask.classList.remove('dragging');
+        draggedTask = null;
+        loadBoard();
+    });
+}
+
+function showCreateColumnModal() {
+    document.getElementById('create-column-modal').classList.add('active');
+}
+
+function closeCreateColumnModal() {
+    document.getElementById('create-column-modal').classList.remove('active');
+}
+
+function showCreateTaskModal(columnId) {
+    document.getElementById('task-modal').classList.add('active');
+    document.getElementById('task-modal-title').textContent = 'Створити задачу';
+    document.getElementById('task-id').value = '';
+    document.getElementById('task-column-id').value = columnId;
+    document.getElementById('task-form').reset();
+    document.getElementById('delete-task-btn').style.display = 'none';
+}
+
+function editTask(taskId, columnId) {
+    // Fetch task details and populate form.
+    fetch(`/api/tasks/${taskId}`, {
+        headers: getAuthHeaders()
+    })
+    .then(res => res.json())
+    .then(task => {
+        document.getElementById('task-modal').classList.add('active');
+        document.getElementById('task-modal-title').textContent = 'Редагувати задачу';
+        document.getElementById('task-id').value = taskId;
+        document.getElementById('task-column-id').value = columnId;
+        document.getElementById('task-title').value = task.title || '';
+        document.getElementById('task-description').value = task.description || '';
+        document.getElementById('task-doer').value = task.doer || '';
+        document.getElementById('task-start-time').value = task.start_time ? task.start_time.substring(0, 16) : '';
+        document.getElementById('task-end-time').value = task.end_time ? task.end_time.substring(0, 16) : '';
+        document.getElementById('task-priority').value = task.priority || '';
+        document.getElementById('delete-task-btn').style.display = 'inline-block';
+    })
+    .catch(err => {
+        console.error('Помилка завантаження задачі:', err);
+        showAlert('Не вдалося завантажити задачу', 'error');
+    });
+}
+
+function closeTaskModal() {
+    document.getElementById('task-modal').classList.remove('active');
+}
+
+function deleteTask() {
+    const taskId = document.getElementById('task-id').value;
+    if (!confirm('Видалити цю задачу?')) return;
+    
+    fetch(`/api/tasks/${taskId}`, {
+        method: 'DELETE',
+        headers: getAuthHeaders()
+    })
+    .then(res => {
+        if (res.ok) {
+            closeTaskModal();
+            loadBoard();
+        }
+    });
+}
+
+function editColumn(id, title) {
+    const newTitle = prompt('Введіть нову назву колонки:', title);
+    if (newTitle && newTitle !== title) {
+        fetch(`/api/columns/${id}`, {
+            method: 'PUT',
+            headers: getAuthHeaders(),
+            body: JSON.stringify({ title: newTitle })
+        })
+        .then(res => {
+            if (res.ok) {
+                loadBoard();
+            }
+        });
+    }
+}
+
+function deleteColumn(id) {
+    if (!confirm('Видалити цю колонку? Усі задачі в ній також буде видалено.')) return;
+    
+    fetch(`/api/columns/${id}`, {
+        method: 'DELETE',
+        headers: getAuthHeaders()
+    })
+    .then(res => {
+        if (res.ok) {
+            loadBoard();
+        }
+    });
+}
+
+document.getElementById('create-column-form').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    
+    const title = document.getElementById('column-title').value;
+    
+    try {
+        const response = await fetch(`/api/boards/${boardId}/columns`, {
+            method: 'POST',
+            headers: getAuthHeaders(),
+            body: JSON.stringify({ title })
+        });
+        
+        if (response.ok) {
+            closeCreateColumnModal();
+            loadBoard();
+        }
+    } catch (err) {
+        showAlert('Не вдалося створити колонку', 'error');
+    }
+});
+
+document.getElementById('task-form').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    
+    const taskId = document.getElementById('task-id').value;
+    const data = {
+        column_id: document.getElementById('task-column-id').value,
+        title: document.getElementById('task-title').value,
+        description: document.getElementById('task-description').value,
+        doer: document.getElementById('task-doer').value,
+        start_time: document.getElementById('task-start-time').value,
+        end_time: document.getElementById('task-end-time').value,
+        priority: document.getElementById('task-priority').value
+    };
+    
+    const url = taskId ? `/api/tasks/${taskId}` : '/api/tasks';
+    const method = taskId ? 'PUT' : 'POST';
+    
+    try {
+        const response = await fetch(url, {
+            method: method,
+            headers: getAuthHeaders(),
+            body: JSON.stringify(data)
+        });
+        
+        if (response.ok) {
+            closeTaskModal();
+            loadBoard();
+        }
+    } catch (err) {
+        showAlert('Не вдалося зберегти задачу', 'error');
+    }
+});
+</script>
+{% endblock %}

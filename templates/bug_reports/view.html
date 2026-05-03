@@ -1,0 +1,72 @@
+{% extends "base.html" %}
+
+{% block title %}Перегляд баг-репорту - Портал якості{% endblock %}
+
+{% block content %}
+<div class="bug-report-view">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+        <h1>Деталі баг-репорту</h1>
+        <div>
+            <a href="/bug-reports/edit/{{ bug_report_id }}" class="btn btn-primary">Редагувати</a>
+            <a href="/bug-reports" class="btn btn-secondary">До списку</a>
+        </div>
+    </div>
+    
+    <div class="card" id="bug-report-details">
+        <p>Завантаження...</p>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    loadBugReport('{{ bug_report_id }}');
+});
+
+function loadBugReport(id) {
+    fetch(`/api/bug-reports/${id}`, {
+        headers: getAuthHeaders()
+    })
+    .then(res => res.json())
+    .then(data => {
+        const container = document.getElementById('bug-report-details');
+        container.innerHTML = `
+            <h2>${data.title}</h2>
+            <div style="margin-top: 1.5rem;">
+                <p><strong>ID:</strong> ${data.given_id}</p>
+                <p><strong>Серйозність:</strong> ${data.severity}</p>
+                <p><strong>Пріоритет:</strong> ${data.priority}</p>
+                <p><strong>Статус:</strong> ${data.status}</p>
+                <p><strong>Версія:</strong> ${data.version || '-'}</p>
+                <p><strong>Середовище:</strong> ${data.environment || '-'}</p>
+                <p><strong>Система та браузер:</strong> ${data.system_and_browser_inf || '-'}</p>
+                <p><strong>Опис:</strong></p>
+                <p>${data.description || '-'}</p>
+                <p><strong>Передумови:</strong></p>
+                <p>${data.preconditions || '-'}</p>
+                <p><strong>Післяумови:</strong></p>
+                <p>${data.postconditions || '-'}</p>
+                <p><strong>Фактичний результат:</strong></p>
+                <p>${data.actual_result || '-'}</p>
+                <p><strong>Очікуваний результат:</strong></p>
+                <p>${data.expected_result || '-'}</p>
+                <p><strong>Коментарі:</strong></p>
+                <p>${data.comments || '-'}</p>
+                <h3 style="margin-top: 2rem;">Кроки відтворення</h3>
+                <ol>
+                    ${data.steps.map(step => `
+                        <li style="margin-bottom: 1rem;">
+                            <strong>${step.step_name}</strong>
+                        </li>
+                    `).join('')}
+                </ol>
+            </div>
+        `;
+    })
+    .catch(err => {
+        console.error('Помилка завантаження баг-репорту:', err);
+        showAlert('Не вдалося завантажити баг-репорт', 'error');
+    });
+}
+</script>
+{% endblock %}
+

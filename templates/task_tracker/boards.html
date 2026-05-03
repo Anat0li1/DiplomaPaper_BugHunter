@@ -1,0 +1,124 @@
+{% extends "base.html" %}
+
+{% block title %}Трекер задач - Портал якості{% endblock %}
+
+{% block content %}
+<div class="task-tracker-boards">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+        <h1>Трекер задач</h1>
+        <button class="btn btn-primary" onclick="showCreateBoardModal()">Створити дошку</button>
+    </div>
+    
+    <div class="grid" id="boards-grid">
+        <p>Завантаження дошок...</p>
+    </div>
+</div>
+
+<!-- Create board modal -->
+<div id="create-board-modal" class="modal">
+    <div class="modal-content">
+        <h2>Створити дошку</h2>
+        <form id="create-board-form">
+            <div class="form-group">
+                <label>Назва дошки *</label>
+                <input type="text" id="board-title" required>
+            </div>
+            <div style="display: flex; gap: 1rem; margin-top: 1rem;">
+                <button type="submit" class="btn btn-primary">Створити</button>
+                <button type="button" class="btn btn-secondary" onclick="closeCreateBoardModal()">Скасувати</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    loadBoards();
+});
+
+function loadBoards() {
+    fetch('/api/boards', {
+        headers: getAuthHeaders()
+    })
+    .then(res => res.json())
+    .then(boards => {
+        const grid = document.getElementById('boards-grid');
+        if (boards.length === 0) {
+            grid.innerHTML = '<p>Дошок не знайдено. Створіть першу дошку.</p>';
+            return;
+        }
+        
+        grid.innerHTML = boards.map(board => `
+            <div class="card" style="cursor: pointer;" onclick="window.location.href='/task-tracker/board/${board.id}'">
+                <h2>${board.title}</h2>
+                <div style="margin-top: 1rem;">
+                    <button class="btn btn-primary" style="padding: 0.25rem 0.75rem; font-size: 0.875rem;" onclick="event.stopPropagation(); editBoard('${board.id}', '${board.title}')">Редагувати</button>
+                    <button class="btn btn-danger" style="padding: 0.25rem 0.75rem; font-size: 0.875rem;" onclick="event.stopPropagation(); deleteBoard('${board.id}')">Видалити</button>
+                </div>
+            </div>
+        `).join('');
+    });
+}
+
+function showCreateBoardModal() {
+    document.getElementById('create-board-modal').classList.add('active');
+}
+
+function closeCreateBoardModal() {
+    document.getElementById('create-board-modal').classList.remove('active');
+    document.getElementById('create-board-form').reset();
+}
+
+function editBoard(id, title) {
+    const newTitle = prompt('Введіть нову назву дошки:', title);
+    if (newTitle && newTitle !== title) {
+        fetch(`/api/boards/${id}`, {
+            method: 'PUT',
+            headers: getAuthHeaders(),
+            body: JSON.stringify({ title: newTitle })
+        })
+        .then(res => {
+            if (res.ok) {
+                loadBoards();
+            }
+        });
+    }
+}
+
+function deleteBoard(id) {
+    if (!confirm('Видалити цю дошку?')) return;
+    
+    fetch(`/api/boards/${id}`, {
+        method: 'DELETE',
+        headers: getAuthHeaders()
+    })
+    .then(res => {
+        if (res.ok) {
+            loadBoards();
+        }
+    });
+}
+
+document.getElementById('create-board-form').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    
+    const title = document.getElementById('board-title').value;
+    
+    try {
+        const response = await fetch('/api/boards', {
+            method: 'POST',
+            headers: getAuthHeaders(),
+            body: JSON.stringify({ title })
+        });
+        
+        if (response.ok) {
+            closeCreateBoardModal();
+            loadBoards();
+        }
+    } catch (err) {
+        showAlert('Не вдалося створити дошку', 'error');
+    }
+});
+</script>
+{% endblock %}
+

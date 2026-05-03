@@ -1,0 +1,57 @@
+{% extends "base.html" %}
+
+{% block title %}Створити магазин - Портал якості{% endblock %}
+
+{% block content %}
+<div class="create-shop">
+    <h1>Створіть свій магазин</h1>
+    
+    <div class="card">
+        <form id="create-shop-form">
+            <div class="form-group">
+                <label>Назва магазину *</label>
+                <input type="text" id="name" name="name" required>
+            </div>
+            
+            <div class="form-group">
+                <label>Опис</label>
+                <textarea id="description" name="description" rows="4"></textarea>
+            </div>
+            
+            <div style="display: flex; gap: 1rem; margin-top: 2rem;">
+                <button type="submit" class="btn btn-primary">Створити магазин</button>
+                <a href="/dashboard" class="btn btn-secondary">Скасувати</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+document.getElementById('create-shop-form').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    
+    const data = {
+        name: document.getElementById('name').value,
+        description: document.getElementById('description').value
+    };
+    
+    try {
+        const response = await fetch('/api/shop', {
+            method: 'POST',
+            headers: getAuthHeaders(),
+            body: JSON.stringify(data)
+        });
+        
+        if (response.ok) {
+            window.location.href = '/storefront';
+        } else {
+            const error = await response.json();
+            showAlert(error.error || 'Не вдалося створити магазин', 'error');
+        }
+    } catch (err) {
+        showAlert('Помилка мережі', 'error');
+    }
+});
+</script>
+{% endblock %}
+
