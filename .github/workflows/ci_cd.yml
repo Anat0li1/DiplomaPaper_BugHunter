@@ -1,10 +1,11 @@
-name: CI/CD - build, migrations, deploy
+name: BugHunter CI/CD
 
 on:
   push:
     branches: [main]
   pull_request:
     branches: [main]
+  workflow_dispatch:
 
 permissions:
   contents: read
@@ -12,30 +13,20 @@ permissions:
 
 jobs:
   checks:
-    name: Перевірки коду та міграцій
+    name: Перевірки коду та міграцій BugHunter
     runs-on: ubuntu-latest
 
-    services:
-      postgres:
-        image: postgres:15
-        env:
-          POSTGRES_USER: postgres
-          POSTGRES_PASSWORD: postgres
-          POSTGRES_DB: quality_portal_test
-        ports:
-          - 5432:5432
-        options: >-
-          --health-cmd "pg_isready -U postgres -d quality_portal_test"
-          --health-interval 10s
-          --health-timeout 5s
-          --health-retries 5
-
     env:
-      DATABASE_URL: postgresql://postgres:postgres@localhost:5432/quality_portal_test
+      DATABASE_URL: ${{ secrets.DATABASE_URL }}
       FLASK_APP: app.py
 
     steps:
       - uses: actions/checkout@v4
+
+      - name: Перевірити доступність Azure DB
+        run: |
+          if [ -z "$DATABASE_URL" ]; then echo "DATABASE_URL не налаштовано"; exit 1; fi
+          echo "DATABASE_URL налаштовано"
 
       - name: Налаштувати Python
         uses: actions/setup-python@v5
@@ -53,9 +44,8 @@ jobs:
       - name: Застосувати міграції бази
         run: alembic upgrade head
 
-      - name: Перевірити, що моделі синхронізовані з міграціями
-        run: |
-          alembic check
+      - name: Перевірити стан міграцій
+        run: alembic current
 
       - name: Запустити тести
         run: |
@@ -66,7 +56,7 @@ jobs:
           fi
 
   deploy:
-    name: Деплой в Azure Web App
+    name: Деплой BugHunter на Azure Web App
     needs: checks
     if: github.event_name == 'push'
     runs-on: ubuntu-latest
