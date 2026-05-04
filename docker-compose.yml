@@ -1,0 +1,58 @@
+version: '3.8'
+
+services:
+  db:
+    image: postgres:15
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: bughunter
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  backend:
+    build: .
+    environment:
+      DATABASE_URL: postgresql://postgres:postgres@db:5432/bughunter
+      SECRET_KEY: ${SECRET_KEY:-dev-secret-key-change-in-production}
+      JWT_SECRET_KEY: ${JWT_SECRET_KEY:-jwt-secret-key-change-in-production}
+      FLASK_ENV: production
+      AZURE_OPENAI_API_KEY: ${AZURE_OPENAI_API_KEY:-}
+      AZURE_OPENAI_ENDPOINT: ${AZURE_OPENAI_ENDPOINT:-}
+      AZURE_SEARCH_API_KEY: ${AZURE_SEARCH_API_KEY:-}
+      AZURE_SEARCH_ENDPOINT: ${AZURE_SEARCH_ENDPOINT:-}
+      AZURE_SEARCH_INDEX: ${AZURE_SEARCH_INDEX:-bughunter-index}
+      AZURE_OPENAI_EMBEDDING_DEPLOYMENT: ${AZURE_OPENAI_EMBEDDING_DEPLOYMENT:-}
+      AZURE_OPENAI_CHAT_DEPLOYMENT: ${AZURE_OPENAI_CHAT_DEPLOYMENT:-}
+      RAG_MAX_CONTEXT_CHARS: ${RAG_MAX_CONTEXT_CHARS:-2000}
+      RAG_TOP_K: ${RAG_TOP_K:-5}
+      RAG_SYSTEM_PROMPT: ${RAG_SYSTEM_PROMPT:-Ви корисний асистент. Використовуйте наданий контекст для відповіді користувачу. Якщо відповіді немає в контексті, скажіть, що не знаєте.}
+
+    ports:
+      - "5000:5000"
+    depends_on:
+      db:
+        condition: service_healthy
+    volumes:
+      - .:/app
+    command: sh -c "alembic upgrade head && python app.py"
+
+  nginx:
+    image: nginx:alpine
+    ports:
+      - "80:80"
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+    depends_on:
+      - backend
+
+volumes:
+  postgres_data:
+
