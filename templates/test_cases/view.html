@@ -1,0 +1,68 @@
+{% extends "base.html" %}
+
+{% block title %}View Test Case - BugHunter{% endblock %}
+
+{% block content %}
+<div class="test-case-view">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+        <h1>Test Case Details</h1>
+        <div>
+            <a href="/test-cases/edit/{{ test_case_id }}" class="btn btn-primary">Edit</a>
+            <a href="/test-cases" class="btn btn-secondary">Back to List</a>
+        </div>
+    </div>
+    
+    <div class="card" id="test-case-details">
+        <p>Loading...</p>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    loadTestCase('{{ test_case_id }}');
+});
+
+function loadTestCase(id) {
+    fetch(`/api/test-cases/${id}`, {
+        headers: getAuthHeaders()
+    })
+    .then(res => res.json())
+    .then(data => {
+        const container = document.getElementById('test-case-details');
+        container.innerHTML = `
+            <h2>${data.title}</h2>
+            <div style="margin-top: 1.5rem;">
+                <p><strong>ID:</strong> ${data.given_id}</p>
+                <p><strong>Application Group:</strong> ${data.application_group || '-'}</p>
+                <p><strong>Priority:</strong> ${['', 'High', 'Medium', 'Low'][data.priority] || 'Medium'}</p>
+                <p><strong>Version:</strong> ${data.version || '-'}</p>
+                <p><strong>Environment:</strong> ${data.environment || '-'}</p>
+                <p><strong>Description:</strong></p>
+                <p>${data.description || '-'}</p>
+                <p><strong>Preconditions:</strong></p>
+                <p>${data.preconditions || '-'}</p>
+                <p><strong>Postconditions:</strong></p>
+                <p>${data.postconditions || '-'}</p>
+                <p><strong>Comments:</strong></p>
+                <p>${data.comments || '-'}</p>
+                <h3 style="margin-top: 2rem;">Test Steps</h3>
+                <ol>
+                    ${data.steps.map(step => `
+                        <li style="margin-bottom: 1rem;">
+                            <strong>${step.step_name}</strong>
+                            ${step.test_data ? `<br><em>Test Data:</em> ${step.test_data}` : ''}
+                            ${step.expected_result ? `<br><em>Expected Result:</em> ${step.expected_result}` : ''}
+                        </li>
+                    `).join('')}
+                </ol>
+            </div>
+        `;
+    })
+    .catch(err => {
+        console.error('Error loading test case:', err);
+        showAlert('Failed to load test case', 'error');
+    });
+}
+</script>
+{% endblock %}
+
