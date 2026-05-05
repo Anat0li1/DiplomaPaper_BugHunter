@@ -1,4 +1,4 @@
-// Authentication utilities.
+// Authentication utilities
 const API_BASE = '/api/auth';
 let currentUser = null;
 
@@ -35,11 +35,11 @@ async function fetchUser() {
             }
             return currentUser;
         } else if (response.status === 401) {
-            // Token invalid, redirect to login.
+            // Token invalid, redirect to login
             window.location.href = '/login.html';
         }
     } catch (error) {
-        console.error('Помилка отримання користувача:', error);
+        console.error('Error fetching user:', error);
     }
     return null;
 }
@@ -51,13 +51,13 @@ async function logout() {
             headers: getAuthHeaders()
         });
     } catch (error) {
-        console.error('Помилка виходу:', error);
+        console.error('Logout error:', error);
     }
     removeToken();
     window.location.href = '/login.html';
 }
 
-// Check auth on page load.
+// Check auth on page load
 document.addEventListener('DOMContentLoaded', () => {
     if (!getToken()) {
         window.location.href = '/login.html';
@@ -66,7 +66,7 @@ document.addEventListener('DOMContentLoaded', () => {
     
     fetchUser();
     
-    // Set up logout button.
+    // Setup logout button
     const logoutBtn = document.getElementById('logout-btn');
     if (logoutBtn) {
         logoutBtn.addEventListener('click', (e) => {

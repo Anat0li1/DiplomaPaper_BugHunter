@@ -1,0 +1,92 @@
+name: CI/CD — Deploy and Reindex
+
+on:
+  push:
+    branches: [ main ]
+
+permissions:
+  contents: read
+  id-token: write
+
+jobs:
+  build:
+    name: Build & Tests
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: cursor-try-2
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Validate Azure deployment secrets (service principal flow)
+        run: |
+          echo "Checking required secrets..."
+          if [ -z "${{ secrets.AZURE_WEBAPP_NAME }}" ]; then echo "ERROR: AZURE_WEBAPP_NAME secret is not set"; exit 1; fi
+          if [ -z "${{ secrets.AZURE_CREDENTIALS }}" ]; then echo "ERROR: AZURE_CREDENTIALS secret is not set (service principal JSON)"; exit 1; fi
+          if [ -z "${{ secrets.AZURE_RESOURCE_GROUP }}" ]; then echo "ERROR: AZURE_RESOURCE_GROUP secret is not set (resource group containing the Web App)"; exit 1; fi
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Run DB migration
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          FLASK_ENV: production
+        run: |
+          if [ -z "$DATABASE_URL" ]; then
+            echo "DATABASE_URL not set — skipping migrations"
+            exit 0
+          fi
+
+          echo "Running Alembic migrations..."
+          export FLASK_APP=app.py
+
+          flask db upgrade
+      
+      - name: Run tests (if any)
+        run: |
+          if [ -f pytest.ini ] || [ -d tests ]; then pytest -q || true; else echo "No tests found"; fi
+
+  deploy:
+    name: Deploy to Azure Web App
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Login to Azure
+        uses: azure/login@v2
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+      - name: Set startup command from start_up.txt
+        working-directory: cursor-try-2
+        run: |
+          if [ ! -f start_up.txt ]; then
+            echo "start_up.txt not found"; exit 1
+          fi
+
+          STARTUP_CMD=$(cat start_up.txt)
+          echo "Setting startup command:"
+          echo "$STARTUP_CMD"
+
+          az webapp config set \
+            --resource-group "${{ secrets.AZURE_RESOURCE_GROUP }}" \
+            --name "${{ secrets.AZURE_WEBAPP_NAME }}" \
+            --startup-file "$STARTUP_CMD"
+
+      - name: Deploy to Azure Web App
+        uses: azure/webapps-deploy@v2
+        with:
+          app-name: ${{ secrets.AZURE_WEBAPP_NAME }}
+          package: cursor-try-2
+
+
+

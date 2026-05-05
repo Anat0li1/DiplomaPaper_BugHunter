@@ -1,11 +1,11 @@
 {% extends "base.html" %}
 
-{% block title %}Товар - Портал якості{% endblock %}
+{% block title %}Product - BugHunter{% endblock %}
 
 {% block content %}
 <div class="product-page">
     <div class="card" id="product-details">
-        <p>Завантаження...</p>
+        <p>Loading...</p>
     </div>
 </div>
 
@@ -30,25 +30,25 @@ function loadProduct(id) {
                     <h1>${product.name}</h1>
                     <p style="font-size: 1.5rem; font-weight: bold; color: #27ae60; margin: 1rem 0;">$${product.price}</p>
                     <p style="margin: 1rem 0;">${product.description || ''}</p>
-                    <p style="color: #999;">Категорія: ${product.category || 'Без категорії'}</p>
+                    <p style="color: #999;">Category: ${product.category || 'Uncategorized'}</p>
                     <p style="color: #999;">Stock: ${product.quantity}</p>
                     
                     <div style="margin-top: 2rem;">
-                        <label>Кількість:</label>
+                        <label>Quantity:</label>
                         <div style="display: flex; align-items: center; gap: 1rem; margin-top: 0.5rem;">
                             <button class="btn btn-secondary" onclick="changeQuantity(-1)">-</button>
                             <input type="number" id="quantity" value="1" min="1" max="${product.quantity}" style="width: 80px; text-align: center;">
                             <button class="btn btn-secondary" onclick="changeQuantity(1)">+</button>
                         </div>
-                        <button class="btn btn-primary" style="margin-top: 1rem; width: 100%;" onclick="addToCart('${product.id}')">Додати до кошика</button>
+                        <button class="btn btn-primary" style="margin-top: 1rem; width: 100%;" onclick="addToCart('${product.id}')">Add to Cart</button>
                     </div>
                 </div>
             </div>
         `;
     })
     .catch(err => {
-        console.error('Помилка завантаження товару:', err);
-        showAlert('Не вдалося завантажити товар', 'error');
+        console.error('Error loading product:', err);
+        showAlert('Failed to load product', 'error');
     });
 }
 
@@ -71,9 +71,9 @@ function addToCart(productId) {
     })
     .then(res => {
         if (res.ok) {
-            showAlert('Додано до кошика', 'success');
+            showAlert('Added to cart', 'success');
         } else {
-            showAlert('Не вдалося додати до кошика', 'error');
+            showAlert('Failed to add to cart', 'error');
         }
     });
 }

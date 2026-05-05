@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% block title %}UI-полігон - Портал якості{% endblock %}
+{% block title %}UI Playground - BugHunter{% endblock %}
 
 {% block extra_css %}
 <style>
@@ -74,94 +74,94 @@ iframe {
 
 {% block content %}
 <div class="ui-playground">
-    <h1>UI-полігон для автоматизації</h1>
-    <p>Набір UI-елементів для тренування автоматизованого тестування</p>
+    <h1>UI Automation Playground</h1>
+    <p>Comprehensive collection of UI elements for automation testing practice</p>
     
-    <!-- Text fields -->
+    <!-- Text Fields -->
     <div class="playground-section">
-        <h2>Текстові поля</h2>
+        <h2>Text Fields</h2>
         <div class="element-group">
-            <label>Звичайне текстове поле</label>
-            <input type="text" placeholder="Введіть текст" class="form-control">
+            <label>Normal Text Field</label>
+            <input type="text" placeholder="Enter text here" class="form-control">
         </div>
         <div class="element-group">
-            <label>Вимкнене текстове поле</label>
-            <input type="text" value="Вимкнене поле" disabled>
+            <label>Disabled Text Field</label>
+            <input type="text" value="Disabled field" disabled>
         </div>
         <div class="element-group">
-            <label>Попередньо заповнене поле</label>
-            <input type="text" value="Це поле вже заповнене">
+            <label>Prefilled Text Field</label>
+            <input type="text" value="This field is prefilled">
         </div>
         <div class="element-group">
-            <label>Приховане текстове поле</label>
-            <input type="text" id="hidden-field" class="hidden-element" value="Приховане значення">
-            <button class="btn btn-secondary" onclick="toggleHidden()">Перемкнути поле</button>
+            <label>Hidden Text Field</label>
+            <input type="text" id="hidden-field" class="hidden-element" value="Hidden value">
+            <button class="btn btn-secondary" onclick="toggleHidden()">Toggle Hidden Field</button>
         </div>
         <div class="element-group">
-            <label>Поле із затримкою появи</label>
-            <input type="text" id="delayed-field" class="delayed-element" placeholder="Це поле зʼявиться через 5 секунд">
+            <label>Delayed Appearance Text Field</label>
+            <input type="text" id="delayed-field" class="delayed-element" placeholder="This field appears after 5 seconds">
         </div>
     </div>
     
     <!-- Buttons -->
     <div class="playground-section">
-        <h2>Кнопки</h2>
+        <h2>Buttons</h2>
         <div class="element-group">
-            <button class="btn btn-primary" onclick="buttonClicked('Звичайна кнопка')">Звичайна кнопка</button>
-            <button class="btn btn-secondary" disabled>Вимкнена кнопка</button>
-            <button class="btn btn-success" id="delayed-btn" class="delayed-element" onclick="buttonClicked('Кнопка із затримкою')">Кнопка із затримкою (5 с)</button>
-            <button class="btn btn-danger" id="hidden-btn" style="display: none;" onclick="buttonClicked('Прихована кнопка')">Прихована кнопка</button>
-            <button class="btn btn-secondary" onclick="toggleButton()">Перемкнути приховану кнопку</button>
+            <button class="btn btn-primary" onclick="buttonClicked('Normal Button')">Normal Button</button>
+            <button class="btn btn-secondary" disabled>Disabled Button</button>
+            <button class="btn btn-success" id="delayed-btn" class="delayed-element" onclick="buttonClicked('Delayed Button')">Delayed Button (5s)</button>
+            <button class="btn btn-danger" id="hidden-btn" style="display: none;" onclick="buttonClicked('Hidden Button')">Hidden Button</button>
+            <button class="btn btn-secondary" onclick="toggleButton()">Toggle Hidden Button</button>
         </div>
         <div id="button-clicks" style="margin-top: 1rem; padding: 1rem; background: #f0f0f0; border-radius: 4px;">
-            <strong>Кліки по кнопках:</strong> <span id="click-count">0</span>
+            <strong>Button Clicks:</strong> <span id="click-count">0</span>
         </div>
     </div>
     
     <!-- Checkboxes -->
     <div class="playground-section">
-        <h2>Чекбокси</h2>
+        <h2>Checkboxes</h2>
         <div class="element-group">
-            <label><input type="checkbox" value="option1"> Опція 1</label>
-            <label><input type="checkbox" value="option2"> Опція 2</label>
-            <label><input type="checkbox" value="option3"> Опція 3</label>
+            <label><input type="checkbox" value="option1"> Option 1</label>
+            <label><input type="checkbox" value="option2"> Option 2</label>
+            <label><input type="checkbox" value="option3"> Option 3</label>
         </div>
         <div class="element-group">
-            <label><input type="checkbox" id="single-checkbox"> Один чекбокс</label>
+            <label><input type="checkbox" id="single-checkbox"> Single Checkbox</label>
         </div>
     </div>
     
-    <!-- Radio groups -->
+    <!-- Radio Groups -->
     <div class="playground-section">
-        <h2>Радіогрупи</h2>
+        <h2>Radio Groups</h2>
         <div class="element-group">
-            <label><input type="radio" name="radio-group" value="option1"> Опція 1</label>
-            <label><input type="radio" name="radio-group" value="option2"> Опція 2</label>
-            <label><input type="radio" name="radio-group" value="option3"> Опція 3</label>
+            <label><input type="radio" name="radio-group" value="option1"> Option 1</label>
+            <label><input type="radio" name="radio-group" value="option2"> Option 2</label>
+            <label><input type="radio" name="radio-group" value="option3"> Option 3</label>
         </div>
     </div>
     
     <!-- Dropdowns -->
     <div class="playground-section">
-        <h2>Випадні списки</h2>
+        <h2>Dropdowns</h2>
         <div class="element-group">
-            <label>Простий список</label>
+            <label>Simple Dropdown</label>
             <select>
-                <option>Опція 1</option>
-                <option>Опція 2</option>
-                <option>Опція 3</option>
+                <option>Option 1</option>
+                <option>Option 2</option>
+                <option>Option 3</option>
             </select>
         </div>
         <div class="element-group">
-            <label>Розширений список із групами</label>
+            <label>Advanced Dropdown (with groups)</label>
             <select>
-                <optgroup label="Група 1">
-                    <option>Елемент 1.1</option>
-                    <option>Елемент 1.2</option>
+                <optgroup label="Group 1">
+                    <option>Item 1.1</option>
+                    <option>Item 1.2</option>
                 </optgroup>
-                <optgroup label="Група 2">
-                    <option>Елемент 2.1</option>
-                    <option>Елемент 2.2</option>
+                <optgroup label="Group 2">
+                    <option>Item 2.1</option>
+                    <option>Item 2.2</option>
                 </optgroup>
             </select>
         </div>
@@ -169,111 +169,111 @@ iframe {
     
     <!-- Multi-select -->
     <div class="playground-section">
-        <h2>Множинний вибір</h2>
+        <h2>Multi-select</h2>
         <div class="element-group">
-            <label>Список множинного вибору</label>
+            <label>Multi-select Dropdown</label>
             <select multiple style="height: 100px;">
-                <option>Опція 1</option>
-                <option>Опція 2</option>
-                <option>Опція 3</option>
-                <option>Опція 4</option>
-                <option>Опція 5</option>
+                <option>Option 1</option>
+                <option>Option 2</option>
+                <option>Option 3</option>
+                <option>Option 4</option>
+                <option>Option 5</option>
             </select>
         </div>
     </div>
     
     <!-- iFrames -->
     <div class="playground-section">
-            <h2>iFrame</h2>
+        <h2>iFrames</h2>
         <div class="iframe-container">
             <div>
-                <h3>Приклад 1: зовнішня сторінка</h3>
+                <h3>Example 1: External Page</h3>
                 <iframe src="https://example.com"></iframe>
             </div>
             <div>
-                <h3>Приклад 2: інша зовнішня сторінка</h3>
+                <h3>Example 2: Another External Page</h3>
                 <iframe src="https://httpbin.org/html"></iframe>
             </div>
         </div>
     </div>
     
-    <!-- Data tables -->
+    <!-- Data Tables -->
     <div class="playground-section">
-        <h2>Динамічні таблиці із сортуванням</h2>
+        <h2>Dynamic/Sortable Data Tables</h2>
         <table class="table sortable-table" id="data-table">
             <thead>
                 <tr>
-                    <th onclick="sortTable(0)">Імʼя ↕</th>
-                    <th onclick="sortTable(1)">Вік ↕</th>
-                    <th onclick="sortTable(2)">Місто ↕</th>
+                    <th onclick="sortTable(0)">Name ↕</th>
+                    <th onclick="sortTable(1)">Age ↕</th>
+                    <th onclick="sortTable(2)">City ↕</th>
                 </tr>
             </thead>
             <tbody>
-                <tr><td>Аліса</td><td>25</td><td>Нью-Йорк</td></tr>
-                <tr><td>Богдан</td><td>30</td><td>Лондон</td></tr>
-                <tr><td>Максим</td><td>22</td><td>Токіо</td></tr>
-                <tr><td>Діана</td><td>28</td><td>Париж</td></tr>
+                <tr><td>Alice</td><td>25</td><td>New York</td></tr>
+                <tr><td>Bob</td><td>30</td><td>London</td></tr>
+                <tr><td>Charlie</td><td>22</td><td>Tokyo</td></tr>
+                <tr><td>Diana</td><td>28</td><td>Paris</td></tr>
             </tbody>
         </table>
     </div>
     
-    <!-- Modal dialogs -->
+    <!-- Modal Dialogs -->
     <div class="playground-section">
-        <h2>Модальні вікна</h2>
-        <button class="btn btn-primary" onclick="showModal()">Відкрити модальне вікно</button>
+        <h2>Modal Dialogs</h2>
+        <button class="btn btn-primary" onclick="showModal()">Open Modal</button>
         <div id="test-modal" class="modal">
             <div class="modal-content">
-                <h2>Тестове модальне вікно</h2>
-                <p>Це модальне вікно для тестування.</p>
-                <button class="btn btn-secondary" onclick="closeModal()">Закрити</button>
+                <h2>Test Modal</h2>
+                <p>This is a modal dialog for testing.</p>
+                <button class="btn btn-secondary" onclick="closeModal()">Close</button>
             </div>
         </div>
     </div>
     
     <!-- Sliders -->
     <div class="playground-section">
-        <h2>Слайдери</h2>
+        <h2>Sliders</h2>
         <div class="element-group">
-            <label>Слайдер діапазону: <span id="slider-value">50</span></label>
+            <label>Range Slider: <span id="slider-value">50</span></label>
             <input type="range" min="0" max="100" value="50" oninput="document.getElementById('slider-value').textContent = this.value">
         </div>
     </div>
     
-    <!-- Date pickers -->
+    <!-- Date Pickers -->
     <div class="playground-section">
-        <h2>Вибір дати й часу</h2>
+        <h2>Date Pickers</h2>
         <div class="element-group">
-            <label>Вибір дати</label>
+            <label>Date Picker</label>
             <input type="date">
         </div>
         <div class="element-group">
-            <label>Вибір часу</label>
+            <label>Time Picker</label>
             <input type="time">
         </div>
         <div class="element-group">
-            <label>Вибір дати й часу</label>
+            <label>DateTime Picker</label>
             <input type="datetime-local">
         </div>
     </div>
     
-    <!-- Other components -->
+    <!-- Other Components -->
     <div class="playground-section">
-        <h2>Інші UI-компоненти</h2>
+        <h2>Other UI Components</h2>
         <div class="element-group">
-            <label>Завантаження файлу</label>
+            <label>File Upload</label>
             <input type="file">
         </div>
         <div class="element-group">
-            <label>Вибір кольору</label>
+            <label>Color Picker</label>
             <input type="color" value="#3498db">
         </div>
         <div class="element-group">
-            <label>Індикатор прогресу</label>
+            <label>Progress Bar</label>
             <progress value="60" max="100">60%</progress>
         </div>
         <div class="element-group">
-            <label>Багаторядкове поле</label>
-            <textarea rows="4" placeholder="Введіть багаторядковий текст"></textarea>
+            <label>Textarea</label>
+            <textarea rows="4" placeholder="Enter multiline text"></textarea>
         </div>
     </div>
 </div>
@@ -284,11 +284,11 @@ let clickCount = 0;
 function buttonClicked(buttonName) {
     clickCount++;
     document.getElementById('click-count').textContent = clickCount;
-    console.log(`Кнопку натиснуто: ${buttonName} (усього: ${clickCount})`);
-    showAlert(`${buttonName}: натиснуто`, 'success');
+    console.log(`Button clicked: ${buttonName} (Total: ${clickCount})`);
+    showAlert(`${buttonName} was clicked!`, 'success');
 }
 
-// Delayed appearance.
+// Delayed appearance
 setTimeout(() => {
     document.getElementById('delayed-field').classList.add('visible');
     document.getElementById('delayed-btn').classList.add('visible');
@@ -338,3 +338,4 @@ function sortTable(columnIndex) {
 }
 </script>
 {% endblock %}
+

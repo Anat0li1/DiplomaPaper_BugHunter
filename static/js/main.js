@@ -1,4 +1,4 @@
-// Main utility functions.
+// Main utility functions
 
 function showAlert(message, type = 'error') {
     const alert = document.createElement('div');

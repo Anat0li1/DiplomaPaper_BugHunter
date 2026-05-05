@@ -1,19 +1,19 @@
 {% extends "base.html" %}
 
-{% block title %}Перегляд баг-репорту - Портал якості{% endblock %}
+{% block title %}View Bug Report - BugHunter{% endblock %}
 
 {% block content %}
 <div class="bug-report-view">
     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
-        <h1>Деталі баг-репорту</h1>
+        <h1>Bug Report Details</h1>
         <div>
-            <a href="/bug-reports/edit/{{ bug_report_id }}" class="btn btn-primary">Редагувати</a>
-            <a href="/bug-reports" class="btn btn-secondary">До списку</a>
+            <a href="/bug-reports/edit/{{ bug_report_id }}" class="btn btn-primary">Edit</a>
+            <a href="/bug-reports" class="btn btn-secondary">Back to List</a>
         </div>
     </div>
     
     <div class="card" id="bug-report-details">
-        <p>Завантаження...</p>
+        <p>Loading...</p>
     </div>
 </div>
 
@@ -33,25 +33,25 @@ function loadBugReport(id) {
             <h2>${data.title}</h2>
             <div style="margin-top: 1.5rem;">
                 <p><strong>ID:</strong> ${data.given_id}</p>
-                <p><strong>Серйозність:</strong> ${data.severity}</p>
-                <p><strong>Пріоритет:</strong> ${data.priority}</p>
-                <p><strong>Статус:</strong> ${data.status}</p>
-                <p><strong>Версія:</strong> ${data.version || '-'}</p>
-                <p><strong>Середовище:</strong> ${data.environment || '-'}</p>
-                <p><strong>Система та браузер:</strong> ${data.system_and_browser_inf || '-'}</p>
-                <p><strong>Опис:</strong></p>
+                <p><strong>Severity:</strong> ${data.severity}</p>
+                <p><strong>Priority:</strong> ${data.priority}</p>
+                <p><strong>Status:</strong> ${data.status}</p>
+                <p><strong>Version:</strong> ${data.version || '-'}</p>
+                <p><strong>Environment:</strong> ${data.environment || '-'}</p>
+                <p><strong>System and Browser Info:</strong> ${data.system_and_browser_inf || '-'}</p>
+                <p><strong>Description:</strong></p>
                 <p>${data.description || '-'}</p>
-                <p><strong>Передумови:</strong></p>
+                <p><strong>Preconditions:</strong></p>
                 <p>${data.preconditions || '-'}</p>
-                <p><strong>Післяумови:</strong></p>
+                <p><strong>Postconditions:</strong></p>
                 <p>${data.postconditions || '-'}</p>
-                <p><strong>Фактичний результат:</strong></p>
+                <p><strong>Actual Result:</strong></p>
                 <p>${data.actual_result || '-'}</p>
-                <p><strong>Очікуваний результат:</strong></p>
+                <p><strong>Expected Result:</strong></p>
                 <p>${data.expected_result || '-'}</p>
-                <p><strong>Коментарі:</strong></p>
+                <p><strong>Comments:</strong></p>
                 <p>${data.comments || '-'}</p>
-                <h3 style="margin-top: 2rem;">Кроки відтворення</h3>
+                <h3 style="margin-top: 2rem;">Reproducing Steps</h3>
                 <ol>
                     ${data.steps.map(step => `
                         <li style="margin-bottom: 1rem;">
@@ -63,8 +63,8 @@ function loadBugReport(id) {
         `;
     })
     .catch(err => {
-        console.error('Помилка завантаження баг-репорту:', err);
-        showAlert('Не вдалося завантажити баг-репорт', 'error');
+        console.error('Error loading bug report:', err);
+        showAlert('Failed to load bug report', 'error');
     });
 }
 </script>

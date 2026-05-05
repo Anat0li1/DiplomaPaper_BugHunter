@@ -28,7 +28,7 @@
 #     AZ_OAI_KEY = os.getenv('AZURE_OPENAI_API_KEY')
 #     AZ_SEARCH = os.getenv('AZURE_SEARCH_ENDPOINT')
 #     if not (AZ_OAI and AZ_OAI_KEY):
-#         response = f"Демо-відповідь асистента: ви написали '{message}'.\n\nЩоб увімкнути реальні відповіді, задайте AZURE_OPENAI_ENDPOINT і AZURE_OPENAI_API_KEY у .env та встановіть azure-ai-openai. Див. docs/AI_ASSISTANT_SETUP.md"
+#         response = f"AI placeholder: you said '{message}'.\n\nTo enable real AI, set AZURE_OPENAI_ENDPOINT and AZURE_OPENAI_API_KEY in .env and install azure-ai-openai. See docs/AI_ASSISTANT_SETUP.md"
 #         return jsonify({'response': response}), 200
 
 #     # Try to perform reply using Azure OpenAI and optional RAG (Qdrant or Azure Search)
@@ -52,7 +52,7 @@
 #                 try:
 #                     from qdrant_client import QdrantClient
 #                 except Exception:
-#                     return jsonify({'response': 'qdrant-client не встановлено на сервері.'}), 500
+#                     return jsonify({'response': 'qdrant-client not installed on server. Install qdrant-client.'}), 500
 
 #                 qdrant_url = os.getenv('QDRANT_URL', 'http://localhost:6333')
 #                 qdrant_api_key = os.getenv('QDRANT_API_KEY')
@@ -80,7 +80,7 @@
 #                     from azure.search.documents import SearchClient
 #                     from azure.core.credentials import AzureKeyCredential as AzureCred
 #                 except Exception:
-#                     return jsonify({'response': 'azure-search-documents не встановлено на сервері.'}), 500
+#                     return jsonify({'response': 'azure-search-documents not installed on server. Install azure-search-documents.'}), 500
 
 #                 search_endpoint = os.getenv('AZURE_SEARCH_ENDPOINT')
 #                 search_key = os.getenv('AZURE_SEARCH_KEY')
@@ -107,19 +107,19 @@
 #             context += '\n' + chunk
 
 #         # Build chat messages
-#         system_prompt = os.getenv('RAG_SYSTEM_PROMPT', 'Ви корисний асистент. Використовуйте наданий контекст для відповіді користувачу. Якщо відповіді немає в контексті, чесно скажіть, що не знаєте.')
+#         system_prompt = os.getenv('RAG_SYSTEM_PROMPT', 'You are a helpful assistant. Use the provided context to answer the user. If the answer is not in the context, reply concisely and honestly that you do not know.')
 #         messages = [
 #             {"role": "system", "content": system_prompt + ("\nContext:\n" + context if context else '')},
 #             {"role": "user", "content": message}
 #         ]
 
 #         resp = openai.get_chat_completions(model=chat_model, messages=messages)
-#         text = resp.choices[0].message.content if resp.choices else 'Немає відповіді'
+#         text = resp.choices[0].message.content if resp.choices else 'No response'
 #         return jsonify({'response': text}), 200
 
 #     except Exception as e:
 #         current_app.logger.exception('OpenAI/RAG call failed')
-#         return jsonify({'response': f'Виклик асистента завершився помилкою: {e}'}), 500
+#         return jsonify({'response': f'AI call failed: {e}'}), 500
 
 
 # @ai_bp.route('/api/ai/upload-pdf', methods=['POST'])
@@ -128,7 +128,7 @@
 #     # Save uploaded PDF to data/pdfs and trigger indexer for that file
 #     f = request.files.get('file')
 #     if not f:
-#         return jsonify({'error': 'Файл не завантажено'}), 400
+#         return jsonify({'error': 'no file uploaded'}), 400
 #     save_dir = os.path.join(os.getcwd(), 'data', 'pdfs')
 #     os.makedirs(save_dir, exist_ok=True)
 #     filename = f.filename
@@ -142,7 +142,7 @@
 #         subprocess.run([os.getenv('PYTHON', 'python'), script, '--index-folder', save_dir], check=True)
 #     except Exception as e:
 #         current_app.logger.exception('Indexing failed')
-#         return jsonify({'error': 'Файл збережено, але індексація не вдалася', 'details': str(e)}), 500
+#         return jsonify({'error': 'saved but indexing failed', 'details': str(e)}), 500
 
 #     return jsonify({'status': 'ok', 'path': save_path}), 200
 
@@ -153,7 +153,7 @@
 #     # Trigger full reindex of data/pdfs
 #     folder = os.path.join(os.getcwd(), 'data', 'pdfs')
 #     if not os.path.exists(folder):
-#         return jsonify({'error': 'Папку PDF не знайдено'}), 404
+#         return jsonify({'error': 'pdf folder not found'}), 404
 #     try:
 #         script = os.path.join(os.getcwd(), 'scripts', 'ai_indexer.py')
 #         subprocess.run([os.getenv('PYTHON', 'python'), script, '--pdf-folder', folder], check=True)
@@ -199,9 +199,9 @@ def api_chat():
     if not all([AZ_OAI_ENDPOINT, AZ_OAI_KEY, EMB_DEPLOYMENT, CHAT_DEPLOYMENT]):
         return jsonify({
             "response": (
-                f"Асистента не налаштовано.\n\n"
-                f"AZURE_OPENAI_ENDPOINT={'задано' if AZ_OAI_ENDPOINT else 'бракує'}\n"
-                f"AZURE_OPENAI_API_KEY={'задано' if AZ_OAI_KEY else 'бракує'}\n"
+                f"AI not configured.\n\n"
+                f"AZURE_OPENAI_ENDPOINT={'set' if AZ_OAI_ENDPOINT else 'missing'}\n"
+                f"AZURE_OPENAI_API_KEY={'set' if AZ_OAI_KEY else 'missing'}\n"
                 f"AZURE_OPENAI_EMBEDDING_DEPLOYMENT={EMB_DEPLOYMENT or 'missing'}\n"
                 f"AZURE_OPENAI_CHAT_DEPLOYMENT={CHAT_DEPLOYMENT or 'missing'}"
             )
@@ -277,8 +277,8 @@ def api_chat():
 
         system_prompt = os.getenv(
             "RAG_SYSTEM_PROMPT",
-            "Ви корисний асистент. Використовуйте наданий контекст для відповіді користувачу. "
-            "Якщо відповіді немає в контексті, скажіть, що не знаєте."
+            "You are a helpful assistant. Use the provided context to answer the user. "
+            "If the answer is not in the context, say you do not know."
         )
 
         messages = [
@@ -307,4 +307,4 @@ def api_chat():
 
     except Exception as e:
         current_app.logger.exception("OpenAI/RAG call failed")
-        return jsonify({"response": f"Виклик асистента завершився помилкою: {e}"}), 500
+        return jsonify({"response": f"AI call failed: {e}"}), 500

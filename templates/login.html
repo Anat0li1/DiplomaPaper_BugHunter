@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="uk">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Вхід - Портал якості</title>
+    <title>Login - BugHunter</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
     <style>
         .login-container {
@@ -58,10 +58,10 @@
 <body>
     <div class="login-container">
         <div class="login-box">
-            <h1>Портал якості</h1>
+            <h1>BugHunter</h1>
             <div class="tabs">
-                <button class="tab active" data-tab="login" onclick="switchTab('login', this)">Вхід</button>
-                <button class="tab" data-tab="register" onclick="switchTab('register', this)">Реєстрація</button>
+                <button class="tab active" data-tab="login" onclick="switchTab('login', this)">Login</button>
+                <button class="tab" data-tab="register" onclick="switchTab('register', this)">Register</button>
             </div>
             
             <div id="error-message"></div>
@@ -72,15 +72,15 @@
                     <input type="email" id="login-email" required>
                 </div>
                 <div class="form-group">
-                    <label>Пароль</label>
+                    <label>Password</label>
                     <input type="password" id="login-password" required>
                 </div>
-                <button type="submit" class="btn btn-primary" style="width: 100%;">Увійти</button>
+                <button type="submit" class="btn btn-primary" style="width: 100%;">Login</button>
             </form>
             
             <form id="register-form" style="display: none;">
                 <div class="form-group">
-                    <label>Імʼя користувача</label>
+                    <label>Username</label>
                     <input type="text" id="register-username" required>
                 </div>
                 <div class="form-group">
@@ -88,10 +88,10 @@
                     <input type="email" id="register-email" required>
                 </div>
                 <div class="form-group">
-                    <label>Пароль</label>
+                    <label>Password</label>
                     <input type="password" id="register-password" required>
                 </div>
-                <button type="submit" class="btn btn-primary" style="width: 100%;">Зареєструватися</button>
+                <button type="submit" class="btn btn-primary" style="width: 100%;">Register</button>
             </form>
         </div>
     </div>
@@ -143,10 +143,10 @@
                     localStorage.setItem('jwt_token', data.access_token);
                     window.location.href = '/dashboard';
                 } else {
-                    showError(data.error || 'Не вдалося увійти');
+                    showError(data.error || 'Login failed');
                 }
             } catch (error) {
-                showError('Помилка мережі. Спробуйте ще раз.');
+                showError('Network error. Please try again.');
             }
         });
         
@@ -166,17 +166,18 @@
                 const data = await response.json();
                 
                 if (response.ok) {
-                    alert('Реєстрація успішна. Тепер увійдіть.');
+                    alert('Registration successful! Please login.');
                     switchTab('login');
                     document.getElementById('login-email').value = email;
                     hideError();
                 } else {
-                    showError(data.error || 'Не вдалося зареєструватися');
+                    showError(data.error || 'Registration failed');
                 }
             } catch (error) {
-                showError('Помилка мережі. Спробуйте ще раз.');
+                showError('Network error. Please try again.');
             }
         });
     </script>
 </body>
 </html>
+

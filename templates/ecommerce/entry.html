@@ -1,10 +1,10 @@
 {% extends "base.html" %}
 
-{% block title %}Тестовий магазин - Портал якості{% endblock %}
+{% block title %}E-commerce - BugHunter{% endblock %}
 
 {% block content %}
 <div class="card">
-    <h1>Завантаження магазину...</h1>
+    <h1>Loading your shop...</h1>
     <p id="entry-status">Checking if you already have a store configured.</p>
 </div>
 {% endblock %}
@@ -24,7 +24,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
         document.getElementById('entry-status').textContent = 'Unable to load shop information. Please try again.';
     } catch (error) {
-        console.error('Помилка перевірки магазину:', error);
+        console.error('Error checking shop:', error);
         document.getElementById('entry-status').textContent = 'Unable to load shop information. Please try again.';
     }
 });

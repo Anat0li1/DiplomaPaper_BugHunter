@@ -6,7 +6,7 @@ from datetime import datetime
 
 auth_bp = Blueprint('auth', __name__)
 
-# Token blocklist. Use Redis or another shared store in production.
+# Token blocklist (in production, use Redis)
 blacklisted_tokens = set()
 
 @auth_bp.route('/login', methods=['GET'])
@@ -16,10 +16,10 @@ def login_page():
 @auth_bp.route('/register', methods=['POST'])
 def register():
     """
-    Зареєструвати нового користувача
+    Register a new user
     ---
     tags:
-      - Автентифікація
+      - Authentication
     parameters:
       - in: body
         name: body
@@ -39,17 +39,17 @@ def register():
               type: string
     responses:
       201:
-        description: Користувача успішно зареєстровано
+        description: User registered successfully
       400:
-        description: Бракує полів або email вже зареєстровано
+        description: Missing fields or email already registered
     """
     data = request.get_json()
     
     if not data or not data.get('email') or not data.get('password') or not data.get('username'):
-        return jsonify({'error': "Заповніть обов'язкові поля"}), 400
+        return jsonify({'error': 'Missing required fields'}), 400
     
     if User.query.filter_by(email=data['email']).first():
-        return jsonify({'error': 'Цей email вже зареєстровано'}), 400
+        return jsonify({'error': 'Email already registered'}), 400
     
     password_hash = hash_password(data['password'])
     user = User(
@@ -61,15 +61,15 @@ def register():
     db.session.add(user)
     db.session.commit()
     
-    return jsonify({'message': 'Користувача успішно зареєстровано'}), 201
+    return jsonify({'message': 'User registered successfully'}), 201
 
 @auth_bp.route('/login', methods=['POST'])
 def login():
     """
-    Вхід користувача
+    User login
     ---
     tags:
-      - Автентифікація
+      - Authentication
     parameters:
       - in: body
         name: body
@@ -86,7 +86,7 @@ def login():
               type: string
     responses:
       200:
-        description: Вхід виконано успішно
+        description: Login successful
         schema:
           type: object
           properties:
@@ -95,17 +95,17 @@ def login():
             user:
               type: object
       401:
-        description: Некоректні облікові дані
+        description: Invalid credentials
     """
     data = request.get_json()
     
     if not data or not data.get('email') or not data.get('password'):
-        return jsonify({'error': 'Email і пароль обовʼязкові'}), 400
+        return jsonify({'error': 'Email and password required'}), 400
     
     user = User.query.filter_by(email=data['email']).first()
     
     if not user or not verify_password(data['password'], user.password_hash):
-        return jsonify({'error': 'Некоректний email або пароль'}), 401
+        return jsonify({'error': 'Invalid credentials'}), 401
     
     access_token = create_access_token(identity=user.id)
     
@@ -123,15 +123,15 @@ def login():
 @jwt_required()
 def get_user():
     """
-    Отримати інформацію про поточного користувача
+    Get current user information
     ---
     tags:
-      - Автентифікація
+      - Authentication
     security:
       - Bearer: []
     responses:
       200:
-        description: Інформація про користувача
+        description: User information
         schema:
           type: object
           properties:
@@ -144,13 +144,13 @@ def get_user():
             active_role:
               type: string
       404:
-        description: Користувача не знайдено
+        description: User not found
     """
     user_id = get_jwt_identity()
     user = User.query.get(user_id)
     
     if not user:
-        return jsonify({'error': 'Користувача не знайдено'}), 404
+        return jsonify({'error': 'User not found'}), 404
     
     return jsonify({
         'id': user.id,
@@ -164,16 +164,16 @@ def get_user():
 def logout():
     jti = get_jwt()['jti']
     blacklisted_tokens.add(jti)
-    return jsonify({'message': 'Вихід виконано успішно'}), 200
+    return jsonify({'message': 'Logged out successfully'}), 200
 
 @auth_bp.route('/update', methods=['PUT'])
 @jwt_required()
 def update_user():
     """
-    Оновити профіль користувача
+    Update user profile
     ---
     tags:
-      - Автентифікація
+      - Authentication
     security:
       - Bearer: []
     parameters:
@@ -190,13 +190,13 @@ def update_user():
               type: string
     responses:
       200:
-        description: Користувача успішно оновлено
+        description: User updated successfully
     """
     user_id = get_jwt_identity()
     user = User.query.get(user_id)
     
     if not user:
-        return jsonify({'error': 'Користувача не знайдено'}), 404
+        return jsonify({'error': 'User not found'}), 404
     
     data = request.get_json()
     
@@ -205,30 +205,30 @@ def update_user():
     
     if 'password' in data:
         if 'old_password' not in data:
-            return jsonify({'error': 'Поточний пароль обовʼязковий'}), 400
+            return jsonify({'error': 'Old password required'}), 400
         
         if not verify_password(data['old_password'], user.password_hash):
-            return jsonify({'error': 'Поточний пароль некоректний'}), 401
+            return jsonify({'error': 'Invalid old password'}), 401
         
         user.password_hash = hash_password(data['password'])
     
     db.session.commit()
     
-    return jsonify({'message': 'Користувача успішно оновлено'}), 200
+    return jsonify({'message': 'User updated successfully'}), 200
 
 @auth_bp.route('/change_role', methods=['POST'])
 @jwt_required()
 def change_role():
     """
-    Перемкнути роль користувача між user та admin
+    Toggle user role between user and admin
     ---
     tags:
-      - Автентифікація
+      - Authentication
     security:
       - Bearer: []
     responses:
       200:
-        description: Роль успішно змінено
+        description: Role changed successfully
         schema:
           type: object
           properties:
@@ -239,13 +239,13 @@ def change_role():
     user = User.query.get(user_id)
     
     if not user:
-        return jsonify({'error': 'Користувача не знайдено'}), 404
+        return jsonify({'error': 'User not found'}), 404
     
-    # Toggle between user and admin.
+    # Toggle between user and admin
     user.active_role = 'admin' if user.active_role == 'user' else 'user'
     db.session.commit()
     
     return jsonify({
-        'message': 'Роль успішно змінено',
+        'message': 'Role changed successfully',
         'active_role': user.active_role
     }), 200

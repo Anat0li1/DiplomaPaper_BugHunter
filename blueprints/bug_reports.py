@@ -26,15 +26,15 @@ def view_bug_report(id):
 @jwt_required()
 def api_list_bug_reports():
     """
-    Отримати список баг-репортів
+    Get list of bug reports
     ---
     tags:
-      - Баг-репорти
+      - Bug Reports
     security:
       - Bearer: []
     responses:
       200:
-        description: Список баг-репортів
+        description: List of bug reports
     """
     user_id = get_jwt_identity()
     bug_reports = BugReport.query.filter(
@@ -54,10 +54,10 @@ def api_list_bug_reports():
 @jwt_required()
 def api_get_bug_report(id):
     """
-    Отримати баг-репорт за ID
+    Get bug report by ID
     ---
     tags:
-      - Баг-репорти
+      - Bug Reports
     security:
       - Bearer: []
     parameters:
@@ -67,18 +67,18 @@ def api_get_bug_report(id):
         required: true
     responses:
       200:
-        description: Деталі баг-репорту
+        description: Bug report details
       404:
-        description: Баг-репорт не знайдено
+        description: Bug report not found
     """
     user_id = get_jwt_identity()
     bug_report = BugReport.query.filter_by(id=id).first()
     
     if not bug_report:
-        return jsonify({'error': 'Баг-репорт не знайдено'}), 404
+        return jsonify({'error': 'Bug report not found'}), 404
     
     if not bug_report.is_system and bug_report.user_id != user_id:
-        return jsonify({'error': 'Доступ заборонено'}), 403
+        return jsonify({'error': 'Access denied'}), 403
     
     return jsonify({
         'id': bug_report.id,
@@ -108,10 +108,10 @@ def api_get_bug_report(id):
 @jwt_required()
 def api_create_bug_report():
     """
-    Створити новий баг-репорт
+    Create a new bug report
     ---
     tags:
-      - Баг-репорти
+      - Bug Reports
     security:
       - Bearer: []
     parameters:
@@ -133,16 +133,16 @@ def api_create_bug_report():
               type: string
     responses:
       201:
-        description: Баг-репорт створено
+        description: Bug report created
     """
     user_id = get_jwt_identity()
     data = request.get_json()
     
-    # Get next given_id.
+    # Get next given_id
     max_id = db.session.query(func.max(BugReport.given_id)).scalar() or 0
     given_id = max_id + 1
     
-    # Find test case by given_id if provided.
+    # Find test case by given_id if provided
     test_case_id = None
     test_case_given_id = data.get('test_case_given_id')
     if test_case_given_id:
@@ -173,7 +173,7 @@ def api_create_bug_report():
     db.session.add(bug_report)
     db.session.flush()
     
-    # Add steps.
+    # Add steps
     for step_data in data.get('steps', []):
         step = BugStep(
             bug_report_id=bug_report.id,
@@ -190,10 +190,10 @@ def api_create_bug_report():
 @jwt_required()
 def api_update_bug_report(id):
     """
-    Оновити баг-репорт
+    Update bug report
     ---
     tags:
-      - Баг-репорти
+      - Bug Reports
     security:
       - Bearer: []
     parameters:
@@ -207,16 +207,16 @@ def api_update_bug_report(id):
           type: object
     responses:
       200:
-        description: Баг-репорт оновлено
+        description: Bug report updated
     """
     user_id = get_jwt_identity()
     bug_report = BugReport.query.filter_by(id=id).first()
     
     if not bug_report:
-        return jsonify({'error': 'Баг-репорт не знайдено'}), 404
+        return jsonify({'error': 'Bug report not found'}), 404
     
     if not bug_report.is_system and bug_report.user_id != user_id:
-        return jsonify({'error': 'Доступ заборонено'}), 403
+        return jsonify({'error': 'Access denied'}), 403
     
     data = request.get_json()
     
@@ -233,7 +233,7 @@ def api_update_bug_report(id):
     bug_report.version = data.get('version', bug_report.version)
     bug_report.environment = data.get('environment', bug_report.environment)
     
-    # Handle test_case_given_id.
+    # Handle test_case_given_id
     test_case_given_id = data.get('test_case_given_id')
     if test_case_given_id:
         test_case = TestCase.query.filter_by(given_id=test_case_given_id).first()
@@ -244,7 +244,7 @@ def api_update_bug_report(id):
     
     bug_report.comments = data.get('comments', bug_report.comments)
     
-    # Replace old steps with submitted steps.
+    # Delete old steps and add new ones
     BugStep.query.filter_by(bug_report_id=bug_report.id).delete()
     for step_data in data.get('steps', []):
         step = BugStep(
@@ -256,16 +256,16 @@ def api_update_bug_report(id):
     
     db.session.commit()
     
-    return jsonify({'message': 'Баг-репорт оновлено'}), 200
+    return jsonify({'message': 'Bug report updated'}), 200
 
 @bug_reports_bp.route('/api/bug-reports/<id>', methods=['DELETE'])
 @jwt_required()
 def api_delete_bug_report(id):
     """
-    Видалити баг-репорт
+    Delete bug report
     ---
     tags:
-      - Баг-репорти
+      - Bug Reports
     security:
       - Bearer: []
     parameters:
@@ -275,18 +275,19 @@ def api_delete_bug_report(id):
         required: true
     responses:
       200:
-        description: Баг-репорт видалено
+        description: Bug report deleted
     """
     user_id = get_jwt_identity()
     bug_report = BugReport.query.filter_by(id=id).first()
     
     if not bug_report:
-        return jsonify({'error': 'Баг-репорт не знайдено'}), 404
+        return jsonify({'error': 'Bug report not found'}), 404
     
     if not bug_report.is_system and bug_report.user_id != user_id:
-        return jsonify({'error': 'Доступ заборонено'}), 403
+        return jsonify({'error': 'Access denied'}), 403
     
     db.session.delete(bug_report)
     db.session.commit()
     
-    return jsonify({'message': 'Баг-репорт видалено'}), 200
+    return jsonify({'message': 'Bug report deleted'}), 200
+

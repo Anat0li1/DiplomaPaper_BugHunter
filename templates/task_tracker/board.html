@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% block title %}Kanban-дошка - Портал якості{% endblock %}
+{% block title %}Kanban Board - BugHunter{% endblock %}
 
 {% block extra_css %}
 <style>
@@ -66,75 +66,75 @@
 {% block content %}
 <div class="kanban-view">
     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
-        <h1 id="board-title">Завантаження...</h1>
+        <h1 id="board-title">Loading...</h1>
         <div>
-            <button class="btn btn-secondary" onclick="showCreateColumnModal()">Додати колонку</button>
-            <button class="btn btn-secondary" onclick="window.location.href='/task-tracker'">До дошок</button>
+            <button class="btn btn-secondary" onclick="showCreateColumnModal()">Add Column</button>
+            <button class="btn btn-secondary" onclick="window.location.href='/task-tracker'">Back to Boards</button>
         </div>
     </div>
     
     <div class="kanban-board" id="kanban-board">
-        <p>Завантаження...</p>
+        <p>Loading...</p>
     </div>
 </div>
 
-<!-- Create column modal -->
+<!-- Create Column Modal -->
 <div id="create-column-modal" class="modal">
     <div class="modal-content">
-        <h2>Створити колонку</h2>
+        <h2>Create New Column</h2>
         <form id="create-column-form">
             <div class="form-group">
-                <label>Назва колонки *</label>
+                <label>Column Title *</label>
                 <input type="text" id="column-title" required>
             </div>
             <div style="display: flex; gap: 1rem; margin-top: 1rem;">
-                <button type="submit" class="btn btn-primary">Створити</button>
-                <button type="button" class="btn btn-secondary" onclick="closeCreateColumnModal()">Скасувати</button>
+                <button type="submit" class="btn btn-primary">Create</button>
+                <button type="button" class="btn btn-secondary" onclick="closeCreateColumnModal()">Cancel</button>
             </div>
         </form>
     </div>
 </div>
 
-<!-- Task modal -->
+<!-- Task Modal -->
 <div id="task-modal" class="modal">
     <div class="modal-content">
-        <h2 id="task-modal-title">Створити задачу</h2>
+        <h2 id="task-modal-title">Create Task</h2>
         <form id="task-form">
             <input type="hidden" id="task-id">
             <input type="hidden" id="task-column-id">
             <div class="form-group">
-                <label>Назва *</label>
+                <label>Title *</label>
                 <input type="text" id="task-title" required>
             </div>
             <div class="form-group">
-                <label>Опис</label>
+                <label>Description</label>
                 <textarea id="task-description" rows="3"></textarea>
             </div>
             <div class="form-group">
-                <label>Виконавець</label>
+                <label>Doer</label>
                 <input type="text" id="task-doer">
             </div>
             <div class="form-group">
-                <label>Початок</label>
+                <label>Start Time</label>
                 <input type="datetime-local" id="task-start-time">
             </div>
             <div class="form-group">
-                <label>Завершення</label>
+                <label>End Time</label>
                 <input type="datetime-local" id="task-end-time">
             </div>
             <div class="form-group">
-                <label>Пріоритет</label>
+                <label>Priority</label>
                 <select id="task-priority">
-                    <option value="">Немає</option>
-                    <option value="High">Високий</option>
-                    <option value="Medium">Середній</option>
-                    <option value="Low">Низький</option>
+                    <option value="">None</option>
+                    <option value="High">High</option>
+                    <option value="Medium">Medium</option>
+                    <option value="Low">Low</option>
                 </select>
             </div>
             <div style="display: flex; gap: 1rem; margin-top: 1rem;">
-                <button type="submit" class="btn btn-primary">Зберегти</button>
-                <button type="button" class="btn btn-secondary" onclick="closeTaskModal()">Скасувати</button>
-                <button type="button" class="btn btn-danger" id="delete-task-btn" style="display: none;" onclick="deleteTask()">Видалити</button>
+                <button type="submit" class="btn btn-primary">Save</button>
+                <button type="button" class="btn btn-secondary" onclick="closeTaskModal()">Cancel</button>
+                <button type="button" class="btn btn-danger" id="delete-task-btn" style="display: none;" onclick="deleteTask()">Delete</button>
             </div>
         </form>
     </div>
@@ -171,11 +171,11 @@ function loadBoard() {
                 <div class="column-header">
                     <h3>${col.title}</h3>
                     <div>
-                        <button class="btn btn-secondary" style="padding: 0.25rem 0.5rem; font-size: 0.75rem;" onclick="editColumn('${col.id}', '${col.title}')">Редагувати</button>
-                        <button class="btn btn-danger" style="padding: 0.25rem 0.5rem; font-size: 0.75rem;" onclick="deleteColumn('${col.id}')">Видалити</button>
+                        <button class="btn btn-secondary" style="padding: 0.25rem 0.5rem; font-size: 0.75rem;" onclick="editColumn('${col.id}', '${col.title}')">Edit</button>
+                        <button class="btn btn-danger" style="padding: 0.25rem 0.5rem; font-size: 0.75rem;" onclick="deleteColumn('${col.id}')">Delete</button>
                     </div>
                 </div>
-                <button class="btn btn-primary" style="width: 100%; margin-bottom: 1rem;" onclick="showCreateTaskModal('${col.id}')">Додати задачу</button>
+                <button class="btn btn-primary" style="width: 100%; margin-bottom: 1rem;" onclick="showCreateTaskModal('${col.id}')">Add Task</button>
                 <div class="tasks-container" data-column-id="${col.id}">
                     ${col.tasks.map(task => `
                         <div class="task-card" draggable="true" ondragstart="drag(event)" data-task-id="${task.id}" onclick="editTask('${task.id}', '${col.id}')">
@@ -185,7 +185,7 @@ function loadBoard() {
                         </div>
                     `).join('')}
                     <div class="drop-zone" ondrop="drop(event)" ondragover="allowDrop(event)" data-column-id="${col.id}">
-                        <p style="text-align: center; color: #999; padding: 1rem;">Перетягніть задачі сюди</p>
+                        <p style="text-align: center; color: #999; padding: 1rem;">Drop tasks here</p>
                     </div>
                 </div>
             </div>
@@ -214,7 +214,7 @@ function dragEnd(ev) {
     if (draggedTask) {
         draggedTask.classList.remove('dragging');
     }
-    // Remove drag-over from all drop zones.
+    // Remove drag-over from all drop zones
     document.querySelectorAll('.drop-zone').forEach(zone => {
         zone.classList.remove('drag-over');
     });
@@ -244,18 +244,18 @@ function drop(ev) {
         return;
     }
     
-    // Get the original column to check if the task moved to another column.
+    // Get the original column to check if we're moving to a different column
     const originalColumn = draggedTask.closest('.tasks-container');
     const originalColumnId = originalColumn ? originalColumn.dataset.columnId : null;
     
-    // If dropping in the same column, do nothing.
+    // If dropping in the same column, do nothing
     if (originalColumnId === columnId) {
         draggedTask.classList.remove('dragging');
         draggedTask = null;
         return;
     }
     
-    // Update task column in the database.
+    // Update task column in database
     fetch(`/api/tasks/${taskId}`, {
         method: 'PUT',
         headers: getAuthHeaders(),
@@ -263,7 +263,7 @@ function drop(ev) {
     })
     .then(res => {
         if (res.ok) {
-            // Move task card to the new column visually.
+            // Move task card to new column visually
             const newColumn = document.querySelector(`.tasks-container[data-column-id="${columnId}"]`);
             if (newColumn && newColumn !== originalColumn) {
                 const dropZone = newColumn.querySelector('.drop-zone');
@@ -276,19 +276,19 @@ function drop(ev) {
             draggedTask.classList.remove('dragging');
             draggedTask = null;
         } else {
-            console.error('Не вдалося оновити задачу');
-            showAlert('Не вдалося перемістити задачу', 'error');
+            console.error('Failed to update task');
+            showAlert('Failed to move task', 'error');
             draggedTask.classList.remove('dragging');
             draggedTask = null;
-            loadBoard();
+            loadBoard(); // Reload to reset state
         }
     })
     .catch(err => {
-        console.error('Помилка переміщення задачі:', err);
-        showAlert('Не вдалося перемістити задачу', 'error');
+        console.error('Error moving task:', err);
+        showAlert('Failed to move task', 'error');
         draggedTask.classList.remove('dragging');
         draggedTask = null;
-        loadBoard();
+        loadBoard(); // Reload to reset state
     });
 }
 
@@ -302,7 +302,7 @@ function closeCreateColumnModal() {
 
 function showCreateTaskModal(columnId) {
     document.getElementById('task-modal').classList.add('active');
-    document.getElementById('task-modal-title').textContent = 'Створити задачу';
+    document.getElementById('task-modal-title').textContent = 'Create Task';
     document.getElementById('task-id').value = '';
     document.getElementById('task-column-id').value = columnId;
     document.getElementById('task-form').reset();
@@ -310,14 +310,14 @@ function showCreateTaskModal(columnId) {
 }
 
 function editTask(taskId, columnId) {
-    // Fetch task details and populate form.
+    // Fetch task details and populate form
     fetch(`/api/tasks/${taskId}`, {
         headers: getAuthHeaders()
     })
     .then(res => res.json())
     .then(task => {
         document.getElementById('task-modal').classList.add('active');
-        document.getElementById('task-modal-title').textContent = 'Редагувати задачу';
+        document.getElementById('task-modal-title').textContent = 'Edit Task';
         document.getElementById('task-id').value = taskId;
         document.getElementById('task-column-id').value = columnId;
         document.getElementById('task-title').value = task.title || '';
@@ -329,8 +329,8 @@ function editTask(taskId, columnId) {
         document.getElementById('delete-task-btn').style.display = 'inline-block';
     })
     .catch(err => {
-        console.error('Помилка завантаження задачі:', err);
-        showAlert('Не вдалося завантажити задачу', 'error');
+        console.error('Error loading task:', err);
+        showAlert('Failed to load task', 'error');
     });
 }
 
@@ -340,7 +340,7 @@ function closeTaskModal() {
 
 function deleteTask() {
     const taskId = document.getElementById('task-id').value;
-    if (!confirm('Видалити цю задачу?')) return;
+    if (!confirm('Are you sure you want to delete this task?')) return;
     
     fetch(`/api/tasks/${taskId}`, {
         method: 'DELETE',
@@ -355,7 +355,7 @@ function deleteTask() {
 }
 
 function editColumn(id, title) {
-    const newTitle = prompt('Введіть нову назву колонки:', title);
+    const newTitle = prompt('Enter new column title:', title);
     if (newTitle && newTitle !== title) {
         fetch(`/api/columns/${id}`, {
             method: 'PUT',
@@ -371,7 +371,7 @@ function editColumn(id, title) {
 }
 
 function deleteColumn(id) {
-    if (!confirm('Видалити цю колонку? Усі задачі в ній також буде видалено.')) return;
+    if (!confirm('Are you sure you want to delete this column? All tasks will be deleted.')) return;
     
     fetch(`/api/columns/${id}`, {
         method: 'DELETE',
@@ -401,7 +401,7 @@ document.getElementById('create-column-form').addEventListener('submit', async (
             loadBoard();
         }
     } catch (err) {
-        showAlert('Не вдалося створити колонку', 'error');
+        showAlert('Failed to create column', 'error');
     }
 });
 
@@ -434,8 +434,9 @@ document.getElementById('task-form').addEventListener('submit', async (e) => {
             loadBoard();
         }
     } catch (err) {
-        showAlert('Не вдалося зберегти задачу', 'error');
+        showAlert('Failed to save task', 'error');
     }
 });
 </script>
 {% endblock %}
+

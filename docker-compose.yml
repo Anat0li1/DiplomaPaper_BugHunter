@@ -6,7 +6,7 @@ services:
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
-      POSTGRES_DB: quality_portal
+      POSTGRES_DB: bughunter
     volumes:
       - postgres_data:/var/lib/postgresql/data
     ports:
@@ -20,20 +20,21 @@ services:
   backend:
     build: .
     environment:
-      DATABASE_URL: postgresql://postgres:postgres@db:5432/quality_portal
+      DATABASE_URL: postgresql://postgres:postgres@db:5432/bughunter
       SECRET_KEY: ${SECRET_KEY:-dev-secret-key-change-in-production}
       JWT_SECRET_KEY: ${JWT_SECRET_KEY:-jwt-secret-key-change-in-production}
       FLASK_ENV: production
-      AZURE_OPENAI_API_KEY: ${AZURE_OPENAI_API_KEY:-}
-      AZURE_OPENAI_ENDPOINT: ${AZURE_OPENAI_ENDPOINT:-}
-      AZURE_SEARCH_API_KEY: ${AZURE_SEARCH_API_KEY:-}
-      AZURE_SEARCH_ENDPOINT: ${AZURE_SEARCH_ENDPOINT:-}
-      AZURE_SEARCH_INDEX: ${AZURE_SEARCH_INDEX:-quality-portal-index}
-      AZURE_OPENAI_EMBEDDING_DEPLOYMENT: ${AZURE_OPENAI_EMBEDDING_DEPLOYMENT:-}
-      AZURE_OPENAI_CHAT_DEPLOYMENT: ${AZURE_OPENAI_CHAT_DEPLOYMENT:-}
-      RAG_MAX_CONTEXT_CHARS: ${RAG_MAX_CONTEXT_CHARS:-2000}
-      RAG_TOP_K: ${RAG_TOP_K:-5}
-      RAG_SYSTEM_PROMPT: ${RAG_SYSTEM_PROMPT:-Ви корисний асистент. Використовуйте наданий контекст для відповіді користувачу. Якщо відповіді немає в контексті, скажіть, що не знаєте.}
+      AZURE_OPENAI_API_KEY: EbSYcjioYD7WEp1r9nsHk24neAFw9olw9eVUWiaG4sRg5ZnEPgycJQQJ99CAACfhMk5XJ3w3AAABACOGwncO
+      AZURE_OPENAI_ENDPOINT: https://bughunterassistant.openai.azure.com
+
+      AZURE_SEARCH_API_KEY: BOekYhlZijd9JmS6br4BEXA11kgbtK8j2fdhMcpi8bAzSeCs57XB
+      AZURE_SEARCH_ENDPOINT: https://bug-hunter-ai-search.search.windows.net
+      AZURE_SEARCH_INDEX_NAME: bug-hunter-index
+      AZURE_OPENAI_EMBEDDING_DEPLOYMENT: text-embedding-3-small
+      AZURE_OPENAI_CHAT_DEPLOYMENT: gpt-4.1-mini
+      RAG_MAX_CONTEXT_CHARS: 2000
+      RAG_TOP_K: 5 
+      RAG_SYSTEM_PROMPT: You are a helpful assistant. Use the provided context to answer the user. If the answer is not in the context, reply concisely and honestly that you do not know.
 
     ports:
       - "5000:5000"

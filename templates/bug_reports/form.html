@@ -1,108 +1,108 @@
 {% extends "base.html" %}
 
-{% block title %}{% if bug_report_id %}Редагування{% else %}Новий{% endif %} баг-репорт - Портал якості{% endblock %}
+{% block title %}{% if bug_report_id %}Edit{% else %}New{% endif %} Bug Report - BugHunter{% endblock %}
 
 {% block content %}
 <div class="bug-report-form">
-    <h1>{% if bug_report_id %}Редагувати{% else %}Створити{% endif %} баг-репорт</h1>
+    <h1>{% if bug_report_id %}Edit{% else %}Create New{% endif %} Bug Report</h1>
     
     <div class="card">
         <form id="bug-report-form">
             <div class="form-group">
-                <label>Назва *</label>
+                <label>Title *</label>
                 <input type="text" id="title" name="title" required>
             </div>
             
             <div class="form-group">
-                <label>Опис</label>
+                <label>Description</label>
                 <textarea id="description" name="description" rows="4"></textarea>
             </div>
             
             <div class="form-group">
-                <label>Передумови</label>
+                <label>Preconditions</label>
                 <textarea id="preconditions" name="preconditions" rows="3"></textarea>
             </div>
             
             <div class="form-group">
-                <label>Післяумови</label>
+                <label>Postconditions</label>
                 <textarea id="postconditions" name="postconditions" rows="3"></textarea>
             </div>
             
             <div class="form-group">
-                <label>Фактичний результат</label>
+                <label>Actual Result</label>
                 <textarea id="actual_result" name="actual_result" rows="3"></textarea>
             </div>
             
             <div class="form-group">
-                <label>Очікуваний результат</label>
+                <label>Expected Result</label>
                 <textarea id="expected_result" name="expected_result" rows="3"></textarea>
             </div>
             
             <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
                 <div class="form-group">
-                    <label>Серйозність</label>
+                    <label>Severity</label>
                     <select id="severity" name="severity">
-                        <option value="Critical">Критична</option>
-                        <option value="High">Висока</option>
-                        <option value="Medium" selected>Середня</option>
-                        <option value="Low">Низька</option>
+                        <option value="Critical">Critical</option>
+                        <option value="High">High</option>
+                        <option value="Medium" selected>Medium</option>
+                        <option value="Low">Low</option>
                     </select>
                 </div>
                 
                 <div class="form-group">
-                    <label>Пріоритет</label>
+                    <label>Priority</label>
                     <select id="priority" name="priority">
-                        <option value="High">Високий</option>
-                        <option value="Medium" selected>Середній</option>
-                        <option value="Low">Низький</option>
+                        <option value="High">High</option>
+                        <option value="Medium" selected>Medium</option>
+                        <option value="Low">Low</option>
                     </select>
                 </div>
             </div>
             
             <div class="form-group">
-                <label>Статус</label>
+                <label>Status</label>
                 <select id="status" name="status">
-                    <option value="New" selected>Новий</option>
-                    <option value="In Progress">У роботі</option>
-                    <option value="Closed">Закрито</option>
-                    <option value="Won't Fix">Не виправлятиметься</option>
+                    <option value="New" selected>New</option>
+                    <option value="In Progress">In Progress</option>
+                    <option value="Closed">Closed</option>
+                    <option value="Won't Fix">Won't Fix</option>
                 </select>
             </div>
             
             <div class="form-group">
-                <label>Інформація про систему та браузер</label>
+                <label>System and Browser Info</label>
                 <input type="text" id="system_and_browser_inf" name="system_and_browser_inf">
             </div>
             
             <div class="form-group">
-                <label>Версія</label>
+                <label>Version</label>
                 <input type="text" id="version" name="version">
             </div>
             
             <div class="form-group">
-                <label>Середовище</label>
+                <label>Environment</label>
                 <input type="text" id="environment" name="environment">
             </div>
             
             <div class="form-group">
-                <label>Зовнішній ID тест-кейсу</label>
-                <input type="text" id="test_case_given_id" name="test_case_given_id" placeholder="ID повʼязаного тест-кейсу">
+                <label>Test Case Given ID</label>
+                <input type="text" id="test_case_given_id" name="test_case_given_id" placeholder="ID of related test case">
             </div>
             
             <div class="form-group">
-                <label>Коментарі</label>
+                <label>Comments</label>
                 <textarea id="comments" name="comments" rows="3"></textarea>
             </div>
             
             <div class="form-group">
-                <label>Кроки відтворення</label>
+                <label>Reproducing Steps</label>
                 <div id="steps-container"></div>
-                <button type="button" class="btn btn-secondary" onclick="addStep()">Додати крок</button>
+                <button type="button" class="btn btn-secondary" onclick="addStep()">Add Step</button>
             </div>
             
             <div style="display: flex; gap: 1rem; margin-top: 2rem;">
-                <button type="submit" class="btn btn-primary">Зберегти</button>
-                <a href="/bug-reports" class="btn btn-secondary">Скасувати</a>
+                <button type="submit" class="btn btn-primary">Save</button>
+                <a href="/bug-reports" class="btn btn-secondary">Cancel</a>
             </div>
         </form>
     </div>
@@ -127,8 +127,8 @@ function addStep() {
     stepDiv.style.cssText = 'display: flex; gap: 1rem; margin-bottom: 1rem; align-items: start;';
     stepDiv.innerHTML = `
         <input type="number" value="${stepCount}" min="1" class="step-number" style="width: 60px;" required>
-        <input type="text" placeholder="Опис кроку" class="step-name" style="flex: 1;" required>
-        <button type="button" class="btn btn-danger" onclick="this.parentElement.remove()">Видалити</button>
+        <input type="text" placeholder="Step description" class="step-name" style="flex: 1;" required>
+        <button type="button" class="btn btn-danger" onclick="this.parentElement.remove()">Remove</button>
     `;
     container.appendChild(stepDiv);
 }
@@ -152,7 +152,7 @@ function loadBugReport(id) {
         document.getElementById('version').value = data.version || '';
         document.getElementById('environment').value = data.environment || '';
         if (data.test_case_id) {
-            // Fetch test case to get given_id.
+            // Fetch test case to get given_id
             fetch(`/api/test-cases/${data.test_case_id}`, {
                 headers: getAuthHeaders()
             })
@@ -178,8 +178,8 @@ function loadBugReport(id) {
         }
     })
     .catch(err => {
-        console.error('Помилка завантаження баг-репорту:', err);
-        showAlert('Не вдалося завантажити баг-репорт', 'error');
+        console.error('Error loading bug report:', err);
+        showAlert('Failed to load bug report', 'error');
     });
 }
 
@@ -220,17 +220,18 @@ document.getElementById('bug-report-form').addEventListener('submit', async (e) 
         });
         
         if (response.ok) {
-            showAlert('Баг-репорт успішно збережено', 'success');
+            showAlert('Bug report saved successfully', 'success');
             setTimeout(() => {
                 window.location.href = '/bug-reports';
             }, 1000);
         } else {
             const error = await response.json();
-            showAlert(error.error || 'Не вдалося зберегти баг-репорт', 'error');
+            showAlert(error.error || 'Failed to save bug report', 'error');
         }
     } catch (err) {
-        showAlert('Помилка мережі', 'error');
+        showAlert('Network error', 'error');
     }
 });
 </script>
 {% endblock %}
+

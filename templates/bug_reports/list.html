@@ -1,12 +1,12 @@
 {% extends "base.html" %}
 
-{% block title %}Баг-репорти - Портал якості{% endblock %}
+{% block title %}Bug Reports - BugHunter{% endblock %}
 
 {% block content %}
 <div class="bug-reports-list">
     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
-        <h1>Баг-репорти</h1>
-        <a href="/bug-reports/new" class="btn btn-primary">Створити баг-репорт</a>
+        <h1>Bug Reports</h1>
+        <a href="/bug-reports/new" class="btn btn-primary">Create New Bug Report</a>
     </div>
     
     <div class="card">
@@ -14,15 +14,15 @@
             <thead>
                 <tr>
                     <th>ID</th>
-                    <th>Назва</th>
-                    <th>Серйозність</th>
-                    <th>Пріоритет</th>
-                    <th>Статус</th>
-                    <th>Дії</th>
+                    <th>Title</th>
+                    <th>Severity</th>
+                    <th>Priority</th>
+                    <th>Status</th>
+                    <th>Actions</th>
                 </tr>
             </thead>
             <tbody id="bug-reports-table">
-                <tr><td colspan="6">Завантаження...</td></tr>
+                <tr><td colspan="6">Loading...</td></tr>
             </tbody>
         </table>
     </div>
@@ -41,7 +41,7 @@ function loadBugReports() {
     .then(data => {
         const tbody = document.getElementById('bug-reports-table');
         if (data.length === 0) {
-            tbody.innerHTML = '<tr><td colspan="6">Баг-репортів не знайдено</td></tr>';
+            tbody.innerHTML = '<tr><td colspan="6">No bug reports found</td></tr>';
             return;
         }
         
@@ -53,21 +53,21 @@ function loadBugReports() {
                 <td>${br.priority}</td>
                 <td>${br.status}</td>
                 <td>
-                    <a href="/bug-reports/view/${br.id}" class="btn btn-secondary" style="padding: 0.25rem 0.75rem; font-size: 0.875rem;">Переглянути</a>
-                    <a href="/bug-reports/edit/${br.id}" class="btn btn-primary" style="padding: 0.25rem 0.75rem; font-size: 0.875rem;">Редагувати</a>
-                    <button onclick="deleteBugReport('${br.id}')" class="btn btn-danger" style="padding: 0.25rem 0.75rem; font-size: 0.875rem;">Видалити</button>
+                    <a href="/bug-reports/view/${br.id}" class="btn btn-secondary" style="padding: 0.25rem 0.75rem; font-size: 0.875rem;">View</a>
+                    <a href="/bug-reports/edit/${br.id}" class="btn btn-primary" style="padding: 0.25rem 0.75rem; font-size: 0.875rem;">Edit</a>
+                    <button onclick="deleteBugReport('${br.id}')" class="btn btn-danger" style="padding: 0.25rem 0.75rem; font-size: 0.875rem;">Delete</button>
                 </td>
             </tr>
         `).join('');
     })
     .catch(err => {
-        console.error('Помилка завантаження баг-репортів:', err);
-        showAlert('Не вдалося завантажити баг-репорти', 'error');
+        console.error('Error loading bug reports:', err);
+        showAlert('Failed to load bug reports', 'error');
     });
 }
 
 function deleteBugReport(id) {
-    if (!confirm('Видалити цей баг-репорт?')) return;
+    if (!confirm('Are you sure you want to delete this bug report?')) return;
     
     fetch(`/api/bug-reports/${id}`, {
         method: 'DELETE',
@@ -75,10 +75,10 @@ function deleteBugReport(id) {
     })
     .then(res => {
         if (res.ok) {
-            showAlert('Баг-репорт видалено', 'success');
+            showAlert('Bug report deleted', 'success');
             loadBugReports();
         } else {
-            showAlert('Не вдалося видалити баг-репорт', 'error');
+            showAlert('Failed to delete bug report', 'error');
         }
     });
 }

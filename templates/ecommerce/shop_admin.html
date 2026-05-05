@@ -1,94 +1,94 @@
 {% extends "base.html" %}
 
-{% block title %}Адміністрування магазину - Портал якості{% endblock %}
+{% block title %}Shop Admin - BugHunter{% endblock %}
 
 {% block content %}
 <div class="shop-admin">
     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
-        <h1>Адміністрування магазину</h1>
+        <h1>Shop Administration</h1>
         <a href="/storefront" class="btn btn-primary">Switch to Storefront</a>
     </div>
     
     <div class="tabs" style="border-bottom: 2px solid #eee; margin-bottom: 2rem;">
-        <button class="tab-btn active" onclick="switchTab('info')">Інформація</button>
-        <button class="tab-btn" onclick="switchTab('products')">Товари</button>
+        <button class="tab-btn active" onclick="switchTab('info')">Shop Info</button>
+        <button class="tab-btn" onclick="switchTab('products')">Manage Products</button>
     </div>
     
     <div id="tab-info" class="tab-content">
         <div class="card">
-            <h2>Інформація про магазин</h2>
+            <h2>Shop Information</h2>
             <form id="shop-info-form">
                 <div class="form-group">
-                    <label>Назва магазину</label>
+                    <label>Shop Name</label>
                     <input type="text" id="shop-name" required>
                 </div>
                 <div class="form-group">
-                    <label>Опис</label>
+                    <label>Description</label>
                     <textarea id="shop-description" rows="4"></textarea>
                 </div>
-                <button type="submit" class="btn btn-primary">Оновити магазин</button>
+                <button type="submit" class="btn btn-primary">Update Shop</button>
             </form>
         </div>
     </div>
     
     <div id="tab-products" class="tab-content" style="display: none;">
         <div style="margin-bottom: 2rem;">
-            <button class="btn btn-primary" onclick="showProductModal()">Додати товар</button>
+            <button class="btn btn-primary" onclick="showProductModal()">Add New Product</button>
         </div>
         
         <div class="card">
             <table class="table">
                 <thead>
                     <tr>
-                        <th>Назва</th>
-                        <th>Категорія</th>
-                        <th>Ціна</th>
-                        <th>Кількість</th>
-                        <th>Дії</th>
+                        <th>Name</th>
+                        <th>Category</th>
+                        <th>Price</th>
+                        <th>Quantity</th>
+                        <th>Actions</th>
                     </tr>
                 </thead>
                 <tbody id="products-table">
-                    <tr><td colspan="5">Завантаження...</td></tr>
+                    <tr><td colspan="5">Loading...</td></tr>
                 </tbody>
             </table>
         </div>
     </div>
 </div>
 
-<!-- Product modal -->
+<!-- Product Modal -->
 <div id="product-modal" class="modal">
     <div class="modal-content">
-        <h2 id="modal-title">Додати товар</h2>
+        <h2 id="modal-title">Add Product</h2>
         <form id="product-form">
             <input type="hidden" id="product-id">
             <div class="form-group">
-                <label>Назва *</label>
+                <label>Name *</label>
                 <input type="text" id="product-name" required>
             </div>
             <div class="form-group">
-                <label>Опис</label>
+                <label>Description</label>
                 <textarea id="product-description" rows="3"></textarea>
             </div>
             <div class="form-group">
-                <label>Ціна *</label>
+                <label>Price *</label>
                 <input type="number" id="product-price" step="0.01" min="0" required>
             </div>
             <div class="form-group">
-                <label>Кількість *</label>
+                <label>Quantity *</label>
                 <input type="number" id="product-quantity" min="0" required>
             </div>
             <div class="form-group">
-                <label>URL зображення</label>
+                <label>Image URL</label>
                 <input type="url" id="product-image">
             </div>
             <div class="form-group">
-                <label>Категорія</label>
+                <label>Category</label>
                 <input type="text" id="product-category" list="category-list">
                 <datalist id="category-list"></datalist>
             </div>
             <div style="display: flex; gap: 1rem; margin-top: 1rem;">
-                <button type="submit" class="btn btn-primary">Зберегти</button>
-                <button type="button" class="btn btn-secondary" onclick="closeProductModal()">Скасувати</button>
+                <button type="submit" class="btn btn-primary">Save</button>
+                <button type="button" class="btn btn-secondary" onclick="closeProductModal()">Cancel</button>
             </div>
         </form>
     </div>
@@ -134,7 +134,7 @@ function loadProducts() {
     })
     .then(res => {
         if (!res.ok) {
-            throw new Error('Не вдалося завантажити товари');
+            throw new Error('Failed to load products');
         }
         return res.json();
     })
@@ -152,16 +152,16 @@ function loadProducts() {
                 <td>$${p.price}</td>
                 <td>${p.quantity}</td>
                 <td>
-                    <button class="btn btn-primary" style="padding: 0.25rem 0.75rem; font-size: 0.875rem;" onclick="editProduct('${p.id}')">Редагувати</button>
-                    <button class="btn btn-danger" style="padding: 0.25rem 0.75rem; font-size: 0.875rem;" onclick="deleteProduct('${p.id}')">Видалити</button>
+                    <button class="btn btn-primary" style="padding: 0.25rem 0.75rem; font-size: 0.875rem;" onclick="editProduct('${p.id}')">Edit</button>
+                    <button class="btn btn-danger" style="padding: 0.25rem 0.75rem; font-size: 0.875rem;" onclick="deleteProduct('${p.id}')">Delete</button>
                 </td>
             </tr>
         `).join('');
     })
     .catch(err => {
-        console.error('Помилка завантаження товарів:', err);
+        console.error('Error loading products:', err);
         const tbody = document.getElementById('products-table');
-        tbody.innerHTML = '<tr><td colspan="5">Помилка завантаження товарів</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="5">Error loading products</td></tr>';
     });
 }
 
@@ -179,7 +179,7 @@ function loadCategories() {
 function showProductModal(productId = null) {
     document.getElementById('product-modal').classList.add('active');
     document.getElementById('product-id').value = productId || '';
-    document.getElementById('modal-title').textContent = productId ? 'Редагувати товар' : 'Додати товар';
+    document.getElementById('modal-title').textContent = productId ? 'Edit Product' : 'Add Product';
     
     if (productId) {
         fetch(`/api/products/${productId}`, {
@@ -208,7 +208,7 @@ function editProduct(id) {
 }
 
 function deleteProduct(id) {
-    if (!confirm('Видалити цей товар?')) return;
+    if (!confirm('Are you sure you want to delete this product?')) return;
     
     fetch(`/api/products/${id}`, {
         method: 'DELETE',
@@ -216,10 +216,10 @@ function deleteProduct(id) {
     })
     .then(res => {
         if (res.ok) {
-            showAlert('Товар видалено', 'success');
+            showAlert('Product deleted', 'success');
             loadProducts();
         } else {
-            showAlert('Не вдалося видалити товар', 'error');
+            showAlert('Failed to delete product', 'error');
         }
     });
 }
@@ -240,12 +240,12 @@ document.getElementById('shop-info-form').addEventListener('submit', async (e) =
         });
         
         if (response.ok) {
-            showAlert('Магазин оновлено', 'success');
+            showAlert('Shop updated', 'success');
         } else {
-            showAlert('Не вдалося оновити магазин', 'error');
+            showAlert('Failed to update shop', 'error');
         }
     } catch (err) {
-        showAlert('Помилка мережі', 'error');
+        showAlert('Network error', 'error');
     }
 });
 
@@ -273,17 +273,17 @@ document.getElementById('product-form').addEventListener('submit', async (e) => 
         });
         
         if (response.ok) {
-            showAlert('Товар збережено', 'success');
+            showAlert('Product saved', 'success');
             closeProductModal();
             loadProducts();
             loadCategories();
         } else {
             const errorData = await response.json().catch(() => ({}));
-            showAlert(errorData.error || 'Не вдалося зберегти товар', 'error');
+            showAlert(errorData.error || 'Failed to save product', 'error');
         }
     } catch (err) {
-        console.error('Помилка збереження товару:', err);
-        showAlert('Помилка мережі', 'error');
+        console.error('Error saving product:', err);
+        showAlert('Network error', 'error');
     }
 });
 </script>
@@ -304,3 +304,4 @@ document.getElementById('product-form').addEventListener('submit', async (e) => 
 }
 </style>
 {% endblock %}
+

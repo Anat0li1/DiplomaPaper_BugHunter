@@ -12,7 +12,7 @@ app = Flask(__name__)
 app.config['SECRET_KEY'] = os.getenv('SECRET_KEY', 'dev-secret-key')
 app.config['JWT_SECRET_KEY'] = os.getenv('JWT_SECRET_KEY', 'jwt-secret-key')
 app.config['JWT_ACCESS_TOKEN_EXPIRES'] = False  # Tokens don't expire
-app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('DATABASE_URL', 'postgresql://postgres:postgres@localhost:5432/quality_portal')
+app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('DATABASE_URL', 'postgresql://postgres:postgres@localhost:5432/bughunter')
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 CORS(app)
@@ -37,8 +37,13 @@ swagger_config = {
 swagger_template = {
     "swagger": "2.0",
     "info": {
-        "title": "API Порталу якості",
-        "description": "Документація API для Порталу якості",
+<<<<<<< Updated upstream:cursor-try-2/app.py
+        "title": "BugHunter API",
+        "description": "API documentation for BugHunter application",
+=======
+        "title": "API BugHunter",
+        "description": "Документація API для порталу BugHunter",
+>>>>>>> Stashed changes:app.py
         "version": "1.0.0"
     },
     "securityDefinitions": {
@@ -46,7 +51,7 @@ swagger_template = {
             "type": "apiKey",
             "name": "Authorization",
             "in": "header",
-            "description": "JWT-заголовок авторизації за схемою Bearer. Приклад: \"Authorization: Bearer {token}\""
+            "description": "JWT Authorization header using the Bearer scheme. Example: \"Authorization: Bearer {token}\""
         }
     },
     "security": [
@@ -63,7 +68,7 @@ db.init_app(app)
 migrate = Migrate(app, db)
 
 # Import blueprints
-from blueprints.auth import auth_bp, blacklisted_tokens
+from blueprints.auth import auth_bp
 from blueprints.dashboard import dashboard_bp
 from blueprints.test_cases import test_cases_bp
 from blueprints.bug_reports import bug_reports_bp
@@ -73,11 +78,6 @@ from blueprints.task_tracker import task_tracker_bp
 from blueprints.ai_helper import ai_helper_bp
 from blueprints.ai_assistant import ai_bp as ai_assistant_bp
 from blueprints.profile import profile_bp
-
-
-@jwt.token_in_blocklist_loader
-def is_token_revoked(jwt_header, jwt_payload):
-    return jwt_payload["jti"] in blacklisted_tokens
 
 # Register blueprints
 app.register_blueprint(auth_bp, url_prefix='/api/auth')
@@ -100,4 +100,7 @@ def login_redirect():
     return redirect('/api/auth/login')
 
 if __name__ == '__main__':
+    with app.app_context():
+        db.create_all()
     app.run(debug=True, host='0.0.0.0', port=5000)
+

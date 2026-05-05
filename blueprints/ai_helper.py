@@ -15,10 +15,10 @@ def ai_helper():
 @jwt_required()
 def api_chat():
     """
-    Надіслати повідомлення асистенту
+    Send chat message to AI
     ---
     tags:
-      - Асистент
+      - AI Helper
     security:
       - Bearer: []
     parameters:
@@ -34,7 +34,7 @@ def api_chat():
               type: string
     responses:
       200:
-        description: Відповідь асистента
+        description: AI response
         schema:
           type: object
           properties:
@@ -44,10 +44,9 @@ def api_chat():
     data = request.get_json()
     message = data.get('message', '')
     
-    # Placeholder for future LLM integration.
-    response = (
-        f"Відповідь асистента (демо): ви написали «{message}». "
-        "Це тестова відповідь. Налаштуйте ключ LLM у .env, щоб увімкнути реальні відповіді."
-    )
+    # Placeholder for LLM integration
+    # In production, integrate with OpenAI, Anthropic, etc.
+    response = f"AI Response (placeholder): You said '{message}'. This is a mock response. Configure your LLM API key in .env to enable real AI responses."
     
     return jsonify({'response': response}), 200
+

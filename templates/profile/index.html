@@ -1,55 +1,55 @@
 {% extends "base.html" %}
 
-{% block title %}Профіль - Портал якості{% endblock %}
+{% block title %}My Profile - BugHunter{% endblock %}
 
 {% block content %}
 <div class="profile-page">
-    <h1>Мій профіль</h1>
+    <h1>My Profile</h1>
     
     <div class="card">
         <form id="profile-form">
             <div class="form-group">
-                <label>Імʼя користувача *</label>
+                <label>Username *</label>
                 <input type="text" id="username" name="username" required>
             </div>
             
             <div class="form-group">
                 <label>Email</label>
                 <input type="email" id="email" name="email" disabled style="background-color: #f5f5f5;">
-                <small style="color: #666;">Email змінити не можна</small>
+                <small style="color: #666;">Email cannot be changed</small>
             </div>
             
             <div class="form-group">
-                <label>Активна роль</label>
+                <label>Active Role</label>
                 <input type="text" id="active_role" name="active_role" disabled style="background-color: #f5f5f5;">
             </div>
             
             <div style="display: flex; gap: 1rem; margin-top: 2rem;">
-                <button type="submit" class="btn btn-primary">Оновити профіль</button>
+                <button type="submit" class="btn btn-primary">Update Profile</button>
             </div>
         </form>
     </div>
     
     <div class="card" style="margin-top: 2rem;">
-        <h2>Змінити пароль</h2>
+        <h2>Change Password</h2>
         <form id="password-form">
             <div class="form-group">
-                <label>Поточний пароль *</label>
+                <label>Current Password *</label>
                 <input type="password" id="old_password" name="old_password" required>
             </div>
             
             <div class="form-group">
-                <label>Новий пароль *</label>
+                <label>New Password *</label>
                 <input type="password" id="new_password" name="new_password" required minlength="6">
             </div>
             
             <div class="form-group">
-                <label>Підтвердіть новий пароль *</label>
+                <label>Confirm New Password *</label>
                 <input type="password" id="confirm_password" name="confirm_password" required minlength="6">
             </div>
             
             <div style="display: flex; gap: 1rem; margin-top: 2rem;">
-                <button type="submit" class="btn btn-primary">Змінити пароль</button>
+                <button type="submit" class="btn btn-primary">Change Password</button>
             </div>
         </form>
     </div>
@@ -71,8 +71,8 @@ function loadProfile() {
         document.getElementById('active_role').value = user.active_role || 'user';
     })
     .catch(err => {
-        console.error('Помилка завантаження профілю:', err);
-        showAlert('Не вдалося завантажити профіль', 'error');
+        console.error('Error loading profile:', err);
+        showAlert('Failed to load profile', 'error');
     });
 }
 
@@ -91,13 +91,13 @@ document.getElementById('profile-form').addEventListener('submit', async (e) => 
         });
         
         if (response.ok) {
-            showAlert('Профіль успішно оновлено', 'success');
+            showAlert('Profile updated successfully', 'success');
         } else {
             const error = await response.json();
-            showAlert(error.error || 'Не вдалося оновити профіль', 'error');
+            showAlert(error.error || 'Failed to update profile', 'error');
         }
     } catch (err) {
-        showAlert('Помилка мережі', 'error');
+        showAlert('Network error', 'error');
     }
 });
 
@@ -108,7 +108,7 @@ document.getElementById('password-form').addEventListener('submit', async (e) =>
     const confirmPassword = document.getElementById('confirm_password').value;
     
     if (newPassword !== confirmPassword) {
-        showAlert('Нові паролі не збігаються', 'error');
+        showAlert('New passwords do not match', 'error');
         return;
     }
     
@@ -125,14 +125,14 @@ document.getElementById('password-form').addEventListener('submit', async (e) =>
         });
         
         if (response.ok) {
-            showAlert('Пароль успішно змінено', 'success');
+            showAlert('Password changed successfully', 'success');
             document.getElementById('password-form').reset();
         } else {
             const error = await response.json();
-            showAlert(error.error || 'Не вдалося змінити пароль', 'error');
+            showAlert(error.error || 'Failed to change password', 'error');
         }
     } catch (err) {
-        showAlert('Помилка мережі', 'error');
+        showAlert('Network error', 'error');
     }
 });
 </script>

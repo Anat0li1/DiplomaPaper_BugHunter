@@ -1,26 +1,26 @@
 {% extends "base.html" %}
 
-{% block title %}Панель - Портал якості{% endblock %}
+{% block title %}Dashboard - BugHunter{% endblock %}
 
 {% block content %}
 <div class="dashboard">
-    <h1>Портал якості</h1>
-    <p class="subtitle">Єдиний простір для QA, тестування та робочих задач</p>
+    <h1>Welcome to BugHunter</h1>
+    <p class="subtitle">Your comprehensive QA and development portal</p>
     
     <div class="grid">
         <div class="card" style="cursor: pointer;" onclick="window.location.href='/ui-playground'">
-            <h2>UI-полігон</h2>
-            <p>Тренуйте автоматизацію на наборі UI-елементів та інтеракцій.</p>
+            <h2>UI Playground</h2>
+            <p>Practice automation with a comprehensive collection of UI elements and interactions.</p>
         </div>
         
         <div class="card" style="cursor: pointer;" onclick="window.location.href='/ecommerce'">
-            <h2>Тестовий магазин</h2>
-            <p>Керуйте магазином, товарами, кошиком і замовленнями в ізольованому середовищі.</p>
+            <h2>E-commerce Sandbox</h2>
+            <p>Manage your personal shop, products, cart, and orders in an isolated environment.</p>
         </div>
         
         <div class="card" style="cursor: pointer;" onclick="window.location.href='/task-tracker'">
-            <h2>Трекер задач</h2>
-            <p>Організовуйте роботу на Kanban-дошках для задач і проєктів.</p>
+            <h2>Task Tracker</h2>
+            <p>Organize your work with a Kanban-style board for managing tasks and projects.</p>
         </div>
     </div>
 </div>

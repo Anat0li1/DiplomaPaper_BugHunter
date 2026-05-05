@@ -1,19 +1,19 @@
 {% extends "base.html" %}
 
-{% block title %}Перегляд тест-кейсу - Портал якості{% endblock %}
+{% block title %}View Test Case - BugHunter{% endblock %}
 
 {% block content %}
 <div class="test-case-view">
     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
-        <h1>Деталі тест-кейсу</h1>
+        <h1>Test Case Details</h1>
         <div>
-            <a href="/test-cases/edit/{{ test_case_id }}" class="btn btn-primary">Редагувати</a>
-            <a href="/test-cases" class="btn btn-secondary">До списку</a>
+            <a href="/test-cases/edit/{{ test_case_id }}" class="btn btn-primary">Edit</a>
+            <a href="/test-cases" class="btn btn-secondary">Back to List</a>
         </div>
     </div>
     
     <div class="card" id="test-case-details">
-        <p>Завантаження...</p>
+        <p>Loading...</p>
     </div>
 </div>
 
@@ -33,25 +33,25 @@ function loadTestCase(id) {
             <h2>${data.title}</h2>
             <div style="margin-top: 1.5rem;">
                 <p><strong>ID:</strong> ${data.given_id}</p>
-                <p><strong>Група застосунку:</strong> ${data.application_group || '-'}</p>
-                <p><strong>Пріоритет:</strong> ${['', 'Високий', 'Середній', 'Низький'][data.priority] || 'Середній'}</p>
-                <p><strong>Версія:</strong> ${data.version || '-'}</p>
-                <p><strong>Середовище:</strong> ${data.environment || '-'}</p>
-                <p><strong>Опис:</strong></p>
+                <p><strong>Application Group:</strong> ${data.application_group || '-'}</p>
+                <p><strong>Priority:</strong> ${['', 'High', 'Medium', 'Low'][data.priority] || 'Medium'}</p>
+                <p><strong>Version:</strong> ${data.version || '-'}</p>
+                <p><strong>Environment:</strong> ${data.environment || '-'}</p>
+                <p><strong>Description:</strong></p>
                 <p>${data.description || '-'}</p>
-                <p><strong>Передумови:</strong></p>
+                <p><strong>Preconditions:</strong></p>
                 <p>${data.preconditions || '-'}</p>
-                <p><strong>Післяумови:</strong></p>
+                <p><strong>Postconditions:</strong></p>
                 <p>${data.postconditions || '-'}</p>
-                <p><strong>Коментарі:</strong></p>
+                <p><strong>Comments:</strong></p>
                 <p>${data.comments || '-'}</p>
-                <h3 style="margin-top: 2rem;">Кроки тесту</h3>
+                <h3 style="margin-top: 2rem;">Test Steps</h3>
                 <ol>
                     ${data.steps.map(step => `
                         <li style="margin-bottom: 1rem;">
                             <strong>${step.step_name}</strong>
-                            ${step.test_data ? `<br><em>Тестові дані:</em> ${step.test_data}` : ''}
-                            ${step.expected_result ? `<br><em>Очікуваний результат:</em> ${step.expected_result}` : ''}
+                            ${step.test_data ? `<br><em>Test Data:</em> ${step.test_data}` : ''}
+                            ${step.expected_result ? `<br><em>Expected Result:</em> ${step.expected_result}` : ''}
                         </li>
                     `).join('')}
                 </ol>
@@ -59,8 +59,8 @@ function loadTestCase(id) {
         `;
     })
     .catch(err => {
-        console.error('Помилка завантаження тест-кейсу:', err);
-        showAlert('Не вдалося завантажити тест-кейс', 'error');
+        console.error('Error loading test case:', err);
+        showAlert('Failed to load test case', 'error');
     });
 }
 </script>

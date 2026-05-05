@@ -1,19 +1,19 @@
 {% extends "base.html" %}
 
-{% block title %}Кошик - Портал якості{% endblock %}
+{% block title %}Cart - BugHunter{% endblock %}
 
 {% block content %}
 <div class="cart">
-    <h1>Кошик</h1>
+    <h1>Shopping Cart</h1>
     
     <div class="card" id="cart-items">
-        <p>Завантаження...</p>
+        <p>Loading...</p>
     </div>
     
     <div class="card" id="cart-summary" style="margin-top: 2rem; display: none;">
         <div style="display: flex; justify-content: space-between; align-items: center;">
-            <h2>Разом: $<span id="cart-total">0.00</span></h2>
-            <button class="btn btn-success" onclick="checkout()">Оформити замовлення</button>
+            <h2>Total: $<span id="cart-total">0.00</span></h2>
+            <button class="btn btn-success" onclick="checkout()">Checkout</button>
         </div>
     </div>
 </div>
@@ -31,7 +31,7 @@ function loadCart() {
     .then(items => {
         const container = document.getElementById('cart-items');
         if (items.length === 0) {
-            container.innerHTML = '<p>Кошик порожній</p>';
+            container.innerHTML = '<p>Your cart is empty</p>';
             document.getElementById('cart-summary').style.display = 'none';
             return;
         }
@@ -41,11 +41,11 @@ function loadCart() {
             <table class="table">
                 <thead>
                     <tr>
-                        <th>Товар</th>
-                        <th>Ціна</th>
-                        <th>Кількість</th>
-                        <th>Проміжний підсумок</th>
-                        <th>Дії</th>
+                        <th>Product</th>
+                        <th>Price</th>
+                        <th>Quantity</th>
+                        <th>Subtotal</th>
+                        <th>Actions</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -65,7 +65,7 @@ function loadCart() {
                                 </td>
                                 <td>$${subtotal.toFixed(2)}</td>
                                 <td>
-                                    <button class="btn btn-danger" style="padding: 0.25rem 0.75rem; font-size: 0.875rem;" onclick="removeItem('${item.id}')">Видалити</button>
+                                    <button class="btn btn-danger" style="padding: 0.25rem 0.75rem; font-size: 0.875rem;" onclick="removeItem('${item.id}')">Remove</button>
                                 </td>
                             </tr>
                         `;
@@ -122,13 +122,13 @@ function checkout() {
         }
     })
     .then(data => {
-        showAlert('Замовлення успішно оформлено', 'success');
+        showAlert('Order placed successfully!', 'success');
         setTimeout(() => {
             window.location.href = '/orders';
         }, 1000);
     })
     .catch(err => {
-        showAlert(err.error || 'Не вдалося оформити замовлення', 'error');
+        showAlert(err.error || 'Checkout failed', 'error');
     });
 }
 </script>

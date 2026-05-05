@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% block title %}Вітрина - Портал якості{% endblock %}
+{% block title %}Storefront - BugHunter{% endblock %}
 
 {% block extra_css %}
 <style>
@@ -63,46 +63,46 @@
 {% block content %}
 <div class="storefront">
     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
-        <h1>Вітрина</h1>
-        <a href="/shop-admin" class="btn btn-primary">Адміністрування</a>
+        <h1>Storefront</h1>
+        <a href="/shop-admin" class="btn btn-primary">Switch to Admin View</a>
     </div>
     
     <div class="filters">
         <div class="filter-group">
-            <label>Сортування</label>
+            <label>Sort By</label>
             <select id="sort-by">
-                <option value="newest">Спочатку нові</option>
-                <option value="oldest">Спочатку старі</option>
-                <option value="price_low">Ціна: від нижчої</option>
-                <option value="price_high">Ціна: від вищої</option>
-                <option value="name_asc">Назва: А-Я</option>
-                <option value="name_desc">Назва: Я-А</option>
+                <option value="newest">Newest</option>
+                <option value="oldest">Oldest</option>
+                <option value="price_low">Price: Low to High</option>
+                <option value="price_high">Price: High to Low</option>
+                <option value="name_asc">Name: A to Z</option>
+                <option value="name_desc">Name: Z to A</option>
             </select>
         </div>
         
         <div class="filter-group">
-            <label>Категорія</label>
+            <label>Category</label>
             <select id="category-filter" multiple style="min-width: 150px;">
             </select>
         </div>
         
         <div class="filter-group">
-            <label>Мін. ціна</label>
+            <label>Min Price</label>
             <input type="number" id="price-min" step="0.01" min="0">
         </div>
         
         <div class="filter-group">
-            <label>Макс. ціна</label>
+            <label>Max Price</label>
             <input type="number" id="price-max" step="0.01" min="0">
         </div>
         
         <div class="filter-group" style="justify-content: flex-end;">
-            <button class="btn btn-secondary" onclick="applyFilters()">Застосувати</button>
+            <button class="btn btn-secondary" onclick="applyFilters()">Apply Filters</button>
         </div>
     </div>
     
     <div class="product-grid" id="product-grid">
-        <p>Завантаження товарів...</p>
+        <p>Loading products...</p>
     </div>
 </div>
 
@@ -126,8 +126,8 @@ document.addEventListener('DOMContentLoaded', async () => {
             })();
         } else if (retries++ > 10) {
             clearInterval(checkAuth);
-            console.error('auth.js не завантажено');
-            showAlert('Помилка автентифікації', 'error');
+            console.error('auth.js not loaded');
+            showAlert('Authentication error', 'error');
         }
     }, 100);
 });
@@ -166,23 +166,23 @@ function loadProducts() {
     .then(products => {
         const grid = document.getElementById('product-grid');
         if (products.length === 0) {
-            grid.innerHTML = '<p>Товарів не знайдено</p>';
+            grid.innerHTML = '<p>No products found</p>';
             return;
         }
         
         grid.innerHTML = products.map(product => `
             <div class="product-card" onclick="window.location.href='/product/${product.id}'">
-                ${product.image_url ? `<img src="${product.image_url}" alt="${product.name}">` : '<div style="height: 200px; background: #eee; display: flex; align-items: center; justify-content: center; margin-bottom: 1rem;">Без зображення</div>'}
+                ${product.image_url ? `<img src="${product.image_url}" alt="${product.name}">` : '<div style="height: 200px; background: #eee; display: flex; align-items: center; justify-content: center; margin-bottom: 1rem;">No Image</div>'}
                 <h3>${product.name}</h3>
                 <p style="color: #666; margin: 0.5rem 0;">${product.description ? product.description.substring(0, 100) + '...' : ''}</p>
                 <p style="font-size: 1.25rem; font-weight: bold; color: #27ae60;">$${product.price}</p>
-                <p style="color: #999; font-size: 0.875rem;">На складі: ${product.quantity}</p>
+                <p style="color: #999; font-size: 0.875rem;">Stock: ${product.quantity}</p>
             </div>
         `).join('');
     })
     .catch(err => {
-        console.error('Помилка завантаження товарів:', err);
-        showAlert('Не вдалося завантажити товари', 'error');
+        console.error('Error loading products:', err);
+        showAlert('Failed to load products', 'error');
     });
 }
 
@@ -191,3 +191,4 @@ function applyFilters() {
 }
 </script>
 {% endblock %}
+

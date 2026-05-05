@@ -38,23 +38,23 @@ def orders():
 @jwt_required()
 def api_get_shop():
     """
-    Отримати магазин користувача
+    Get user's shop
     ---
     tags:
-      - Магазин
+      - E-commerce
     security:
       - Bearer: []
     responses:
       200:
-        description: Інформація про магазин
+        description: Shop information
       404:
-        description: Магазин не знайдено
+        description: Shop not found
     """
     user_id = get_jwt_identity()
     shop = Shop.query.filter_by(user_id=user_id).first()
     
     if not shop:
-        return jsonify({'error': 'Магазин не знайдено'}), 404
+        return jsonify({'error': 'Shop not found'}), 404
     
     return jsonify({
         'id': shop.id,
@@ -66,10 +66,10 @@ def api_get_shop():
 @jwt_required()
 def api_create_shop():
     """
-    Створити новий магазин
+    Create a new shop
     ---
     tags:
-      - Магазин
+      - E-commerce
     security:
       - Bearer: []
     parameters:
@@ -87,13 +87,13 @@ def api_create_shop():
               type: string
     responses:
       201:
-        description: Магазин створено
+        description: Shop created
     """
     user_id = get_jwt_identity()
     data = request.get_json()
     
     if Shop.query.filter_by(user_id=user_id).first():
-        return jsonify({'error': 'Магазин вже існує'}), 400
+        return jsonify({'error': 'Shop already exists'}), 400
     
     shop = Shop(
         user_id=user_id,
@@ -113,7 +113,7 @@ def api_update_shop():
     shop = Shop.query.filter_by(user_id=user_id).first()
     
     if not shop:
-        return jsonify({'error': 'Магазин не знайдено'}), 404
+        return jsonify({'error': 'Shop not found'}), 404
     
     data = request.get_json()
     shop.name = data.get('name', shop.name)
@@ -121,16 +121,16 @@ def api_update_shop():
     
     db.session.commit()
     
-    return jsonify({'message': 'Магазин оновлено'}), 200
+    return jsonify({'message': 'Shop updated'}), 200
 
 @ecommerce_bp.route('/api/products', methods=['GET'])
 @jwt_required()
 def api_list_products():
     """
-    Отримати список товарів
+    Get list of products
     ---
     tags:
-      - Магазин
+      - E-commerce
     security:
       - Bearer: []
     parameters:
@@ -148,7 +148,7 @@ def api_list_products():
         type: number
     responses:
       200:
-        description: Список товарів
+        description: List of products
     """
     user_id = get_jwt_identity()
     shop = Shop.query.filter_by(user_id=user_id).first()
@@ -158,7 +158,7 @@ def api_list_products():
     
     products = Product.query.filter_by(shop_id=shop.id).all()
     
-    # Apply filters.
+    # Apply filters
     category_filter = request.args.get('category')
     price_min = request.args.get('price_min')
     price_max = request.args.get('price_max')
@@ -172,7 +172,7 @@ def api_list_products():
     if price_max:
         filtered = [p for p in filtered if float(p.price) <= float(price_max)]
     
-    # Sort.
+    # Sort
     if sort_by == 'price_low':
         filtered.sort(key=lambda x: float(x.price))
     elif sort_by == 'price_high':
@@ -200,10 +200,10 @@ def api_list_products():
 @jwt_required()
 def api_get_product(id):
     """
-    Отримати товар за ID
+    Get product by ID
     ---
     tags:
-      - Магазин
+      - E-commerce
     security:
       - Bearer: []
     parameters:
@@ -213,12 +213,12 @@ def api_get_product(id):
         required: true
     responses:
       200:
-        description: Деталі товару
+        description: Product details
     """
     product = Product.query.get(id)
     
     if not product:
-        return jsonify({'error': 'Товар не знайдено'}), 404
+        return jsonify({'error': 'Product not found'}), 404
     
     return jsonify({
         'id': product.id,
@@ -234,10 +234,10 @@ def api_get_product(id):
 @jwt_required()
 def api_create_product():
     """
-    Створити новий товар
+    Create a new product
     ---
     tags:
-      - Магазин
+      - E-commerce
     security:
       - Bearer: []
     parameters:
@@ -258,17 +258,17 @@ def api_create_product():
               type: string
     responses:
       201:
-        description: Товар створено
+        description: Product created
     """
     user_id = get_jwt_identity()
     shop = Shop.query.filter_by(user_id=user_id).first()
     
     if not shop:
-        return jsonify({'error': 'Магазин не знайдено'}), 404
+        return jsonify({'error': 'Shop not found'}), 404
     
     data = request.get_json()
     
-    # Check if category exists, create if not.
+    # Check if category exists, create if not
     category_name = data.get('category')
     if category_name:
         category = Category.query.filter_by(shop_id=shop.id, name=category_name).first()
@@ -298,14 +298,14 @@ def api_update_product(id):
     product = Product.query.get(id)
     
     if not product:
-        return jsonify({'error': 'Товар не знайдено'}), 404
+        return jsonify({'error': 'Product not found'}), 404
     
     if product.shop.user_id != user_id:
-        return jsonify({'error': 'Доступ заборонено'}), 403
+        return jsonify({'error': 'Access denied'}), 403
     
     data = request.get_json()
     
-    # Handle category.
+    # Handle category
     category_name = data.get('category')
     if category_name:
         category = Category.query.filter_by(shop_id=product.shop_id, name=category_name).first()
@@ -322,7 +322,7 @@ def api_update_product(id):
     
     db.session.commit()
     
-    return jsonify({'message': 'Товар оновлено'}), 200
+    return jsonify({'message': 'Product updated'}), 200
 
 @ecommerce_bp.route('/api/products/<id>', methods=['DELETE'])
 @jwt_required()
@@ -331,15 +331,15 @@ def api_delete_product(id):
     product = Product.query.get(id)
     
     if not product:
-        return jsonify({'error': 'Товар не знайдено'}), 404
+        return jsonify({'error': 'Product not found'}), 404
     
     if product.shop.user_id != user_id:
-        return jsonify({'error': 'Доступ заборонено'}), 403
+        return jsonify({'error': 'Access denied'}), 403
     
     db.session.delete(product)
     db.session.commit()
     
-    return jsonify({'message': 'Товар видалено'}), 200
+    return jsonify({'message': 'Product deleted'}), 200
 
 @ecommerce_bp.route('/api/categories', methods=['GET'])
 @jwt_required()
@@ -357,15 +357,15 @@ def api_list_categories():
 @jwt_required()
 def api_get_cart():
     """
-    Отримати кошик користувача
+    Get user's shopping cart
     ---
     tags:
-      - Магазин
+      - E-commerce
     security:
       - Bearer: []
     responses:
       200:
-        description: Товари в кошику
+        description: Cart items
     """
     user_id = get_jwt_identity()
     cart_items = CartItem.query.filter_by(user_id=user_id).all()
@@ -388,7 +388,7 @@ def api_add_to_cart():
     product_id = data.get('product_id')
     quantity = data.get('quantity', 1)
     
-    # Check if item already in cart.
+    # Check if item already in cart
     existing = CartItem.query.filter_by(user_id=user_id, product_id=product_id).first()
     if existing:
         existing.quantity += quantity
@@ -402,7 +402,7 @@ def api_add_to_cart():
     
     db.session.commit()
     
-    return jsonify({'message': 'Товар додано до кошика'}), 201
+    return jsonify({'message': 'Added to cart'}), 201
 
 @ecommerce_bp.route('/api/cart/<id>', methods=['PUT'])
 @jwt_required()
@@ -411,14 +411,14 @@ def api_update_cart_item(id):
     cart_item = CartItem.query.filter_by(id=id, user_id=user_id).first()
     
     if not cart_item:
-        return jsonify({'error': 'Товар у кошику не знайдено'}), 404
+        return jsonify({'error': 'Cart item not found'}), 404
     
     data = request.get_json()
     cart_item.quantity = data.get('quantity', cart_item.quantity)
     
     db.session.commit()
     
-    return jsonify({'message': 'Кошик оновлено'}), 200
+    return jsonify({'message': 'Cart item updated'}), 200
 
 @ecommerce_bp.route('/api/cart/<id>', methods=['DELETE'])
 @jwt_required()
@@ -427,32 +427,32 @@ def api_delete_cart_item(id):
     cart_item = CartItem.query.filter_by(id=id, user_id=user_id).first()
     
     if not cart_item:
-        return jsonify({'error': 'Товар у кошику не знайдено'}), 404
+        return jsonify({'error': 'Cart item not found'}), 404
     
     db.session.delete(cart_item)
     db.session.commit()
     
-    return jsonify({'message': 'Товар видалено з кошика'}), 200
+    return jsonify({'message': 'Cart item deleted'}), 200
 
 @ecommerce_bp.route('/api/checkout', methods=['POST'])
 @jwt_required()
 def api_checkout():
     """
-    Оформити кошик і створити замовлення
+    Checkout cart and create order
     ---
     tags:
-      - Магазин
+      - E-commerce
     security:
       - Bearer: []
     responses:
       201:
-        description: Замовлення створено
+        description: Order created
     """
     user_id = get_jwt_identity()
     cart_items = CartItem.query.filter_by(user_id=user_id).all()
     
     if not cart_items:
-        return jsonify({'error': 'Кошик порожній'}), 400
+        return jsonify({'error': 'Cart is empty'}), 400
     
     total = Decimal(0)
     order_items_data = []
@@ -460,7 +460,7 @@ def api_checkout():
     for item in cart_items:
         product = item.product
         if product.quantity < item.quantity:
-            return jsonify({'error': f'Недостатня кількість товару: {product.name}'}), 400
+            return jsonify({'error': f'Insufficient quantity for {product.name}'}), 400
         
         item_total = Decimal(product.price) * item.quantity
         total += item_total
@@ -471,12 +471,12 @@ def api_checkout():
             'price': product.price
         })
     
-    # Create order.
+    # Create order
     order = Order(user_id=user_id, total_amount=total)
     db.session.add(order)
     db.session.flush()
     
-    # Create order items and decrement product quantities.
+    # Create order items and decrement product quantities
     for item_data in order_items_data:
         order_item = OrderItem(
             order_id=order.id,
@@ -488,7 +488,7 @@ def api_checkout():
         db.session.add(order_item)
         item_data['product'].quantity -= item_data['quantity']
     
-    # Clear cart.
+    # Clear cart
     CartItem.query.filter_by(user_id=user_id).delete()
     
     db.session.commit()
@@ -511,3 +511,4 @@ def api_list_orders():
             'quantity': item.quantity
         } for item in order.items]
     } for order in orders]), 200
+

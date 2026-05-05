@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% block title %}Асистент - Портал якості{% endblock %}
+{% block title %}AI Helper - BugHunter{% endblock %}
 
 {% block extra_css %}
 <style>
@@ -65,20 +65,20 @@
 
 {% block content %}
 <div class="ai-helper">
-    <h1>Асистент</h1>
-    <p>Ставте питання та отримуйте допомогу в робочому контексті</p>
+    <h1>AI Helper</h1>
+    <p>Ask questions and get AI-powered assistance</p>
     
     <div class="chat-container">
         <div class="chat-messages" id="chat-messages">
             <div class="message ai">
-                <div class="message-header">Асистент</div>
-                <div>Вітаю! Чим можу допомогти?</div>
+                <div class="message-header">AI Assistant</div>
+                <div>Hello! How can I help you today?</div>
             </div>
         </div>
         
         <div class="chat-input-container">
-            <input type="text" id="message-input" placeholder="Напишіть повідомлення..." onkeypress="if(event.key === 'Enter') sendMessage()">
-            <button class="btn btn-primary" onclick="sendMessage()">Надіслати</button>
+            <input type="text" id="message-input" placeholder="Type your message..." onkeypress="if(event.key === 'Enter') sendMessage()">
+            <button class="btn btn-primary" onclick="sendMessage()">Send</button>
         </div>
     </div>
 </div>
@@ -90,12 +90,12 @@ function sendMessage() {
     
     if (!message) return;
     
-    // Add user message to chat.
+    // Add user message to chat
     const messagesContainer = document.getElementById('chat-messages');
     const userMessage = document.createElement('div');
     userMessage.className = 'message user';
     userMessage.innerHTML = `
-        <div class="message-header">Ви</div>
+        <div class="message-header">You</div>
         <div>${message}</div>
     `;
     messagesContainer.appendChild(userMessage);
@@ -103,7 +103,7 @@ function sendMessage() {
     
     input.value = '';
     
-    // Send to API.
+    // Send to API (use AI assistant blueprint under /ai/)
     fetch('/ai/api/ai/chat', {
         method: 'POST',
         headers: getAuthHeaders(),
@@ -114,15 +114,15 @@ function sendMessage() {
         const aiMessage = document.createElement('div');
         aiMessage.className = 'message ai';
         aiMessage.innerHTML = `
-            <div class="message-header">Асистент</div>
+            <div class="message-header">AI Assistant</div>
             <div>${data.response}</div>
         `;
         messagesContainer.appendChild(aiMessage);
         messagesContainer.scrollTop = messagesContainer.scrollHeight;
     })
     .catch(err => {
-        console.error('Помилка:', err);
-        showAlert('Не вдалося отримати відповідь асистента', 'error');
+        console.error('Error:', err);
+        showAlert('Failed to get AI response', 'error');
     });
 }
 </script>

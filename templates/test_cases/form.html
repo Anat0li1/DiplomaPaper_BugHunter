@@ -1,77 +1,77 @@
 {% extends "base.html" %}
 
-{% block title %}{% if test_case_id %}Редагування{% else %}Новий{% endif %} тест-кейс - Портал якості{% endblock %}
+{% block title %}{% if test_case_id %}Edit{% else %}New{% endif %} Test Case - BugHunter{% endblock %}
 
 {% block content %}
 <div class="test-case-form">
-    <h1>{% if test_case_id %}Редагувати{% else %}Створити{% endif %} тест-кейс</h1>
+    <h1>{% if test_case_id %}Edit{% else %}Create New{% endif %} Test Case</h1>
     
     <div class="card">
         <form id="test-case-form">
             <div class="form-group">
-                <label>Зовнішній ID</label>
-                <input type="text" id="given_id" name="given_id" placeholder="Необовʼязковий власний ID">
+                <label>Given ID</label>
+                <input type="text" id="given_id" name="given_id" placeholder="Optional custom ID">
             </div>
             
             <div class="form-group">
-                <label>Група застосунку</label>
+                <label>Application Group</label>
                 <input type="text" id="application_group" name="application_group">
             </div>
             
             <div class="form-group">
-                <label>Назва *</label>
+                <label>Title *</label>
                 <input type="text" id="title" name="title" required>
             </div>
             
             <div class="form-group">
-                <label>Опис</label>
+                <label>Description</label>
                 <textarea id="description" name="description" rows="4"></textarea>
             </div>
             
             <div class="form-group">
-                <label>Пріоритет</label>
+                <label>Priority</label>
                 <select id="priority" name="priority">
-                    <option value="1">Високий</option>
-                    <option value="2" selected>Середній</option>
-                    <option value="3">Низький</option>
+                    <option value="1">High</option>
+                    <option value="2" selected>Medium</option>
+                    <option value="3">Low</option>
                 </select>
             </div>
             
             <div class="form-group">
-                <label>Передумови</label>
+                <label>Preconditions</label>
                 <textarea id="preconditions" name="preconditions" rows="3"></textarea>
             </div>
             
             <div class="form-group">
-                <label>Післяумови</label>
+                <label>Postconditions</label>
                 <textarea id="postconditions" name="postconditions" rows="3"></textarea>
             </div>
             
             <div class="form-group">
-                <label>Версія</label>
+                <label>Version</label>
                 <input type="text" id="version" name="version">
             </div>
             
             <div class="form-group">
-                <label>Середовище</label>
+                <label>Environment</label>
                 <input type="text" id="environment" name="environment">
             </div>
             
             <div class="form-group">
-                <label>Коментарі</label>
+                <label>Comments</label>
                 <textarea id="comments" name="comments" rows="3"></textarea>
             </div>
             
             <div class="form-group">
-                <label>Кроки тесту</label>
+                <label>Test Steps</label>
                 <div id="steps-container"></div>
-                <button type="button" class="btn btn-secondary" onclick="addStep()">Додати крок</button>
-                <button type="button" class="btn btn-secondary" onclick="renumberSteps()">Перенумерувати</button>
+                <button type="button" class="btn btn-secondary" onclick="addStep()">Add Step</button>
+                <button type="button" class="btn btn-secondary" onclick="renumberSteps()">Renumber Steps</button>
             </div>
             
             <div style="display: flex; gap: 1rem; margin-top: 2rem;">
-                <button type="submit" class="btn btn-primary">Зберегти</button>
-                <a href="/test-cases" class="btn btn-secondary">Скасувати</a>
+                <button type="submit" class="btn btn-primary">Save</button>
+                <a href="/test-cases" class="btn btn-secondary">Cancel</a>
             </div>
         </form>
     </div>
@@ -96,10 +96,10 @@ function addStep() {
     stepDiv.style.cssText = 'display: flex; gap: 1rem; margin-bottom: 1rem; align-items: start;';
     stepDiv.innerHTML = `
         <input type="number" value="${stepCount}" min="1" class="step-number" style="width: 60px;" required>
-        <input type="text" placeholder="Назва кроку" class="step-name" style="flex: 1;" required>
-        <input type="text" placeholder="Тестові дані" class="step-data" style="flex: 1;">
-        <input type="text" placeholder="Очікуваний результат" class="step-result" style="flex: 1;">
-        <button type="button" class="btn btn-danger" onclick="removeStep(this)">Видалити</button>
+        <input type="text" placeholder="Step name" class="step-name" style="flex: 1;" required>
+        <input type="text" placeholder="Test data" class="step-data" style="flex: 1;">
+        <input type="text" placeholder="Expected result" class="step-result" style="flex: 1;">
+        <button type="button" class="btn btn-danger" onclick="removeStep(this)">Remove</button>
     `;
     container.appendChild(stepDiv);
     renumberSteps();
@@ -151,8 +151,8 @@ function loadTestCase(id) {
         }
     })
     .catch(err => {
-        console.error('Помилка завантаження тест-кейсу:', err);
-        showAlert('Не вдалося завантажити тест-кейс', 'error');
+        console.error('Error loading test case:', err);
+        showAlert('Failed to load test case', 'error');
     });
 }
 
@@ -191,17 +191,18 @@ document.getElementById('test-case-form').addEventListener('submit', async (e) =
         });
         
         if (response.ok) {
-            showAlert('Тест-кейс успішно збережено', 'success');
+            showAlert('Test case saved successfully', 'success');
             setTimeout(() => {
                 window.location.href = '/test-cases';
             }, 1000);
         } else {
             const error = await response.json();
-            showAlert(error.error || 'Не вдалося зберегти тест-кейс', 'error');
+            showAlert(error.error || 'Failed to save test case', 'error');
         }
     } catch (err) {
-        showAlert('Помилка мережі', 'error');
+        showAlert('Network error', 'error');
     }
 });
 </script>
 {% endblock %}
+

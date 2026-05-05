@@ -18,15 +18,15 @@ def board_view(id):
 @jwt_required()
 def api_list_boards():
     """
-    Отримати список дошок
+    Get list of boards
     ---
     tags:
-      - Трекер задач
+      - Task Tracker
     security:
       - Bearer: []
     responses:
       200:
-        description: Список дошок
+        description: List of boards
     """
     user_id = get_jwt_identity()
     boards = Board.query.filter_by(user_id=user_id).all()
@@ -40,10 +40,10 @@ def api_list_boards():
 @jwt_required()
 def api_create_board():
     """
-    Створити нову дошку
+    Create a new board
     ---
     tags:
-      - Трекер задач
+      - Task Tracker
     security:
       - Bearer: []
     parameters:
@@ -59,7 +59,7 @@ def api_create_board():
               type: string
     responses:
       201:
-        description: Дошку створено
+        description: Board created
     """
     user_id = get_jwt_identity()
     data = request.get_json()
@@ -81,7 +81,7 @@ def api_get_board(id):
     board = Board.query.filter_by(id=id, user_id=user_id).first()
     
     if not board:
-        return jsonify({'error': 'Дошку не знайдено'}), 404
+        return jsonify({'error': 'Board not found'}), 404
     
     return jsonify({
         'id': board.id,
@@ -95,14 +95,14 @@ def api_update_board(id):
     board = Board.query.filter_by(id=id, user_id=user_id).first()
     
     if not board:
-        return jsonify({'error': 'Дошку не знайдено'}), 404
+        return jsonify({'error': 'Board not found'}), 404
     
     data = request.get_json()
     board.title = data.get('title', board.title)
     
     db.session.commit()
     
-    return jsonify({'message': 'Дошку оновлено'}), 200
+    return jsonify({'message': 'Board updated'}), 200
 
 @task_tracker_bp.route('/api/boards/<id>', methods=['DELETE'])
 @jwt_required()
@@ -111,12 +111,12 @@ def api_delete_board(id):
     board = Board.query.filter_by(id=id, user_id=user_id).first()
     
     if not board:
-        return jsonify({'error': 'Дошку не знайдено'}), 404
+        return jsonify({'error': 'Board not found'}), 404
     
     db.session.delete(board)
     db.session.commit()
     
-    return jsonify({'message': 'Дошку видалено'}), 200
+    return jsonify({'message': 'Board deleted'}), 200
 
 @task_tracker_bp.route('/api/boards/<board_id>/columns', methods=['GET'])
 @jwt_required()
@@ -125,7 +125,7 @@ def api_list_columns(board_id):
     board = Board.query.filter_by(id=board_id, user_id=user_id).first()
     
     if not board:
-        return jsonify({'error': 'Дошку не знайдено'}), 404
+        return jsonify({'error': 'Board not found'}), 404
     
     columns = Column.query.filter_by(board_id=board_id).order_by(Column.ordering).all()
     
@@ -152,11 +152,11 @@ def api_create_column(board_id):
     board = Board.query.filter_by(id=board_id, user_id=user_id).first()
     
     if not board:
-        return jsonify({'error': 'Дошку не знайдено'}), 404
+        return jsonify({'error': 'Board not found'}), 404
     
     data = request.get_json()
     
-    # Get max ordering.
+    # Get max ordering
     max_ordering = db.session.query(func.max(Column.ordering)).filter_by(board_id=board_id).scalar() or 0
     
     column = Column(
@@ -177,7 +177,7 @@ def api_update_column(id):
     column = Column.query.join(Board).filter(Column.id == id, Board.user_id == user_id).first()
     
     if not column:
-        return jsonify({'error': 'Колонку не знайдено'}), 404
+        return jsonify({'error': 'Column not found'}), 404
     
     data = request.get_json()
     column.title = data.get('title', column.title)
@@ -187,7 +187,7 @@ def api_update_column(id):
     
     db.session.commit()
     
-    return jsonify({'message': 'Колонку оновлено'}), 200
+    return jsonify({'message': 'Column updated'}), 200
 
 @task_tracker_bp.route('/api/columns/<id>', methods=['DELETE'])
 @jwt_required()
@@ -196,21 +196,21 @@ def api_delete_column(id):
     column = Column.query.join(Board).filter(Column.id == id, Board.user_id == user_id).first()
     
     if not column:
-        return jsonify({'error': 'Колонку не знайдено'}), 404
+        return jsonify({'error': 'Column not found'}), 404
     
     db.session.delete(column)
     db.session.commit()
     
-    return jsonify({'message': 'Колонку видалено'}), 200
+    return jsonify({'message': 'Column deleted'}), 200
 
 @task_tracker_bp.route('/api/tasks', methods=['POST'])
 @jwt_required()
 def api_create_task():
     """
-    Створити нову задачу
+    Create a new task
     ---
     tags:
-      - Трекер задач
+      - Task Tracker
     security:
       - Bearer: []
     parameters:
@@ -231,7 +231,7 @@ def api_create_task():
               type: string
     responses:
       201:
-        description: Задачу створено
+        description: Task created
     """
     user_id = get_jwt_identity()
     data = request.get_json()
@@ -239,7 +239,7 @@ def api_create_task():
     column = Column.query.join(Board).filter(Column.id == data.get('column_id'), Board.user_id == user_id).first()
     
     if not column:
-        return jsonify({'error': 'Колонку не знайдено'}), 404
+        return jsonify({'error': 'Column not found'}), 404
     
     from datetime import datetime as dt
     
@@ -266,7 +266,7 @@ def api_get_task(id):
     task = Task.query.join(Column).join(Board).filter(Task.id == id, Board.user_id == user_id).first()
     
     if not task:
-        return jsonify({'error': 'Задачу не знайдено'}), 404
+        return jsonify({'error': 'Task not found'}), 404
     
     return jsonify({
         'id': task.id,
@@ -284,10 +284,10 @@ def api_get_task(id):
 @jwt_required()
 def api_update_task(id):
     """
-    Оновити задачу, зокрема перемістити в іншу колонку
+    Update task (including moving to different column)
     ---
     tags:
-      - Трекер задач
+      - Task Tracker
     security:
       - Bearer: []
     parameters:
@@ -306,13 +306,13 @@ def api_update_task(id):
               type: string
     responses:
       200:
-        description: Задачу оновлено
+        description: Task updated
     """
     user_id = get_jwt_identity()
     task = Task.query.join(Column).join(Board).filter(Task.id == id, Board.user_id == user_id).first()
     
     if not task:
-        return jsonify({'error': 'Задачу не знайдено'}), 404
+        return jsonify({'error': 'Task not found'}), 404
     
     data = request.get_json()
     
@@ -335,7 +335,7 @@ def api_update_task(id):
     
     db.session.commit()
     
-    return jsonify({'message': 'Задачу оновлено'}), 200
+    return jsonify({'message': 'Task updated'}), 200
 
 @task_tracker_bp.route('/api/tasks/<id>', methods=['DELETE'])
 @jwt_required()
@@ -344,9 +344,10 @@ def api_delete_task(id):
     task = Task.query.join(Column).join(Board).filter(Task.id == id, Board.user_id == user_id).first()
     
     if not task:
-        return jsonify({'error': 'Задачу не знайдено'}), 404
+        return jsonify({'error': 'Task not found'}), 404
     
     db.session.delete(task)
     db.session.commit()
     
-    return jsonify({'message': 'Задачу видалено'}), 200
+    return jsonify({'message': 'Task deleted'}), 200
+

@@ -26,15 +26,15 @@ def view_test_case(id):
 @jwt_required()
 def api_list_test_cases():
     """
-    Отримати список тест-кейсів
+    Get list of test cases
     ---
     tags:
-      - Тест-кейси
+      - Test Cases
     security:
       - Bearer: []
     responses:
       200:
-        description: Список тест-кейсів
+        description: List of test cases
     """
     user_id = get_jwt_identity()
     test_cases = TestCase.query.filter(
@@ -54,10 +54,10 @@ def api_list_test_cases():
 @jwt_required()
 def api_get_test_case(id):
     """
-    Отримати тест-кейс за ID
+    Get test case by ID
     ---
     tags:
-      - Тест-кейси
+      - Test Cases
     security:
       - Bearer: []
     parameters:
@@ -67,18 +67,18 @@ def api_get_test_case(id):
         required: true
     responses:
       200:
-        description: Деталі тест-кейсу
+        description: Test case details
       404:
-        description: Тест-кейс не знайдено
+        description: Test case not found
     """
     user_id = get_jwt_identity()
     test_case = TestCase.query.filter_by(id=id).first()
     
     if not test_case:
-        return jsonify({'error': 'Тест-кейс не знайдено'}), 404
+        return jsonify({'error': 'Test case not found'}), 404
     
     if not test_case.is_system and test_case.user_id != user_id:
-        return jsonify({'error': 'Доступ заборонено'}), 403
+        return jsonify({'error': 'Access denied'}), 403
     
     return jsonify({
         'id': test_case.id,
@@ -106,10 +106,10 @@ def api_get_test_case(id):
 @jwt_required()
 def api_create_test_case():
     """
-    Створити новий тест-кейс
+    Create a new test case
     ---
     tags:
-      - Тест-кейси
+      - Test Cases
     security:
       - Bearer: []
     parameters:
@@ -133,17 +133,17 @@ def api_create_test_case():
               type: array
     responses:
       201:
-        description: Тест-кейс створено
+        description: Test case created
     """
     user_id = get_jwt_identity()
     data = request.get_json()
     
-    # Get next given_id if not provided.
+    # Get next given_id if not provided
     given_id = data.get('given_id')
     if not given_id:
-        # Auto-generate numeric ID.
+        # Auto-generate numeric ID
         try:
-            # Get all numeric given_ids and find max.
+            # Get all numeric given_ids and find max
             all_cases = TestCase.query.filter(TestCase.given_id.isnot(None)).all()
             numeric_ids = []
             for tc in all_cases:
@@ -176,7 +176,7 @@ def api_create_test_case():
     db.session.add(test_case)
     db.session.flush()
     
-    # Add steps.
+    # Add steps
     for step_data in data.get('steps', []):
         step = TestStep(
             test_case_id=test_case.id,
@@ -195,10 +195,10 @@ def api_create_test_case():
 @jwt_required()
 def api_update_test_case(id):
     """
-    Оновити тест-кейс
+    Update test case
     ---
     tags:
-      - Тест-кейси
+      - Test Cases
     security:
       - Bearer: []
     parameters:
@@ -212,16 +212,16 @@ def api_update_test_case(id):
           type: object
     responses:
       200:
-        description: Тест-кейс оновлено
+        description: Test case updated
     """
     user_id = get_jwt_identity()
     test_case = TestCase.query.filter_by(id=id).first()
     
     if not test_case:
-        return jsonify({'error': 'Тест-кейс не знайдено'}), 404
+        return jsonify({'error': 'Test case not found'}), 404
     
     if not test_case.is_system and test_case.user_id != user_id:
-        return jsonify({'error': 'Доступ заборонено'}), 403
+        return jsonify({'error': 'Access denied'}), 403
     
     data = request.get_json()
     
@@ -237,7 +237,7 @@ def api_update_test_case(id):
     test_case.environment = data.get('environment', test_case.environment)
     test_case.comments = data.get('comments', test_case.comments)
     
-    # Replace old steps with submitted steps.
+    # Delete old steps and add new ones
     TestStep.query.filter_by(test_case_id=test_case.id).delete()
     for step_data in data.get('steps', []):
         step = TestStep(
@@ -251,16 +251,16 @@ def api_update_test_case(id):
     
     db.session.commit()
     
-    return jsonify({'message': 'Тест-кейс оновлено'}), 200
+    return jsonify({'message': 'Test case updated'}), 200
 
 @test_cases_bp.route('/api/test-cases/<id>', methods=['DELETE'])
 @jwt_required()
 def api_delete_test_case(id):
     """
-    Видалити тест-кейс
+    Delete test case
     ---
     tags:
-      - Тест-кейси
+      - Test Cases
     security:
       - Bearer: []
     parameters:
@@ -270,18 +270,19 @@ def api_delete_test_case(id):
         required: true
     responses:
       200:
-        description: Тест-кейс видалено
+        description: Test case deleted
     """
     user_id = get_jwt_identity()
     test_case = TestCase.query.filter_by(id=id).first()
     
     if not test_case:
-        return jsonify({'error': 'Тест-кейс не знайдено'}), 404
+        return jsonify({'error': 'Test case not found'}), 404
     
     if not test_case.is_system and test_case.user_id != user_id:
-        return jsonify({'error': 'Доступ заборонено'}), 403
+        return jsonify({'error': 'Access denied'}), 403
     
     db.session.delete(test_case)
     db.session.commit()
     
-    return jsonify({'message': 'Тест-кейс видалено'}), 200
+    return jsonify({'message': 'Test case deleted'}), 200
+
