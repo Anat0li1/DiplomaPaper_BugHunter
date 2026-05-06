@@ -7,6 +7,7 @@ Create Date: 2026-05-03 00:00:00.000000
 
 from alembic import op
 import sqlalchemy as sa
+from sqlalchemy import inspect
 
 
 revision = "20260503_0001"
@@ -16,7 +17,8 @@ depends_on = None
 
 
 def upgrade() -> None:
-    if not op.has_table("users"):
+    inspector = inspect(op.get_bind())
+    if not inspector.has_table("users"):
         op.create_table(
             "users",
             sa.Column("id", sa.String(length=36), nullable=False),
@@ -29,7 +31,7 @@ def upgrade() -> None:
             sa.UniqueConstraint("email"),
         )
 
-    if not op.has_table("boards"):
+    if not inspector.has_table("boards"):
         op.create_table(
             "boards",
             sa.Column("id", sa.String(length=36), nullable=False),
@@ -39,7 +41,7 @@ def upgrade() -> None:
             sa.PrimaryKeyConstraint("id"),
         )
 
-    if not op.has_table("bug_reports"):
+    if not inspector.has_table("bug_reports"):
         op.create_table(
             "bug_reports",
             sa.Column("id", sa.String(length=36), nullable=False),
@@ -66,7 +68,7 @@ def upgrade() -> None:
             sa.PrimaryKeyConstraint("id"),
         )
 
-    if not op.has_table("shops"):
+    if not inspector.has_table("shops"):
         op.create_table(
             "shops",
             sa.Column("id", sa.String(length=36), nullable=False),
@@ -78,7 +80,7 @@ def upgrade() -> None:
             sa.UniqueConstraint("user_id"),
         )
 
-    if not op.has_table("test_cases"):
+    if not inspector.has_table("test_cases"):
         op.create_table(
             "test_cases",
             sa.Column("id", sa.String(length=36), nullable=False),
@@ -100,7 +102,7 @@ def upgrade() -> None:
             sa.PrimaryKeyConstraint("id"),
         )
 
-    if not op.has_table("categories"):
+    if not inspector.has_table("categories"):
         op.create_table(
             "categories",
             sa.Column("id", sa.String(length=36), nullable=False),
@@ -111,7 +113,7 @@ def upgrade() -> None:
             sa.UniqueConstraint("shop_id", "name", name="unique_category_per_shop"),
         )
 
-    if not op.has_table("columns"):
+    if not inspector.has_table("columns"):
         op.create_table(
             "columns",
             sa.Column("id", sa.String(length=36), nullable=False),
@@ -122,7 +124,7 @@ def upgrade() -> None:
             sa.PrimaryKeyConstraint("id"),
         )
 
-    if not op.has_table("products"):
+    if not inspector.has_table("products"):
         op.create_table(
             "products",
             sa.Column("id", sa.String(length=36), nullable=False),
@@ -145,7 +147,7 @@ def upgrade() -> None:
         ["id"],
     )
 
-    if not op.has_table("bug_steps"):
+    if not inspector.has_table("bug_steps"):
         op.create_table(
             "bug_steps",
             sa.Column("id", sa.String(length=36), nullable=False),
@@ -156,7 +158,7 @@ def upgrade() -> None:
             sa.PrimaryKeyConstraint("id"),
         )
 
-    if not op.has_table("cart_items"):
+    if not inspector.has_table("cart_items"):
         op.create_table(
             "cart_items",
             sa.Column("id", sa.String(length=36), nullable=False),
@@ -168,7 +170,7 @@ def upgrade() -> None:
             sa.PrimaryKeyConstraint("id"),
         )
 
-    if not op.has_table("orders"):
+    if not inspector.has_table("orders"):
         op.create_table(
             "orders",
             sa.Column("id", sa.String(length=36), nullable=False),
@@ -179,7 +181,7 @@ def upgrade() -> None:
             sa.PrimaryKeyConstraint("id"),
         )
 
-    if not op.has_table("tasks"):
+    if not inspector.has_table("tasks"):
         op.create_table(
             "tasks",
             sa.Column("id", sa.String(length=36), nullable=False),
@@ -195,7 +197,7 @@ def upgrade() -> None:
             sa.PrimaryKeyConstraint("id"),
         )
 
-    if not op.has_table("test_steps"):
+    if not inspector.has_table("test_steps"):
         op.create_table(
             "test_steps",
             sa.Column("id", sa.String(length=36), nullable=False),
@@ -208,7 +210,7 @@ def upgrade() -> None:
             sa.PrimaryKeyConstraint("id"),
         )
 
-    if not op.has_table("order_items"):
+    if not inspector.has_table("order_items"):
         op.create_table(
             "order_items",
             sa.Column("id", sa.String(length=36), nullable=False),
