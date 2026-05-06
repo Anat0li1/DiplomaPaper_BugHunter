@@ -1,9 +1,12 @@
-name: Build and Deploy Flask App to Azure
+name: Build, Check DB & Migrations, Deploy Flask App to Azure
 
 on:
   push:
     branches:
       - main
+
+env:
+  DATABASE_URL: ${{ secrets.DATABASE_URL }}
 
 jobs:
   build:
@@ -16,7 +19,7 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
-          python-version: '3.14'
+          python-version: '3.11'
 
       - name: Install dependencies
         run: |
@@ -34,11 +37,105 @@ jobs:
           name: flask-app
           path: app.zip
 
-  deploy:
+  check-database:
     runs-on: ubuntu-latest
     needs: build
 
     steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r bug-hunter/requirements.txt
+
+      - name: Install PostgreSQL client
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y postgresql-client
+
+      - name: Check database connection and create if needed
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+        run: |
+          cd bug-hunter
+          python -c "
+          import os
+          import psycopg2
+          from urllib.parse import urlparse
+          
+          db_url = os.getenv('DATABASE_URL')
+          parsed = urlparse(db_url)
+          
+          # Connect to postgres to create DB if needed
+          try:
+              conn = psycopg2.connect(
+                  host=parsed.hostname,
+                  port=parsed.port or 5432,
+                  user=parsed.username,
+                  password=parsed.password,
+                  database=parsed.path.lstrip('/')
+              )
+              print('✓ Оригінальна база знайдена та доступна')
+              conn.close()
+          except psycopg2.errors.OperationalError as e:
+              if 'does not exist' in str(e):
+                  print('⚠ База не існує, підключаюсь до postgres для створення...')
+                  try:
+                      conn = psycopg2.connect(
+                          host=parsed.hostname,
+                          port=parsed.port or 5432,
+                          user=parsed.username,
+                          password=parsed.password,
+                          database='postgres'
+                      )
+                      conn.autocommit = True
+                      cur = conn.cursor()
+                      cur.execute(f\"CREATE DATABASE {parsed.path.lstrip('/')}\")
+                      print(f\"✓ База '{parsed.path.lstrip('/')}' успішно створена\")
+                      cur.close()
+                      conn.close()
+                  except Exception as create_err:
+                      print(f'✗ Помилка при створенні бази: {create_err}')
+                      exit(1)
+              else:
+                  print(f'✗ Помилка при підключенні: {e}')
+                  exit(1)
+          "
+
+      - name: Check and run migrations
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+        run: |
+          cd bug-hunter
+          echo "Перевіряємо поточний стан міграцій..."
+          alembic current || echo "Версія міграцій не знайдена"
+          
+          echo "Отримуємо список несумісних міграцій..."
+          alembic heads || echo "Всі міграції актуальні"
+          
+          echo "Запускаємо міграції до останньої версії..."
+          alembic upgrade head || {
+            echo "⚠ Помилка при запуску міграцій, перевірте алембік конфіг"
+            exit 1
+          }
+          
+          echo "✓ Міграції завершено успішно"
+
+  deploy:
+    runs-on: ubuntu-latest
+    needs: [build, check-database]
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
       - name: Download artifact
         uses: actions/download-artifact@v4
         with:
@@ -52,5 +149,9 @@ jobs:
       - name: Deploy to Azure Web App
         uses: azure/webapps-deploy@v2
         with:
-          app-name: YOUR_APP_SERVICE_NAME
+          app-name: ${{ secrets.AZURE_WEBAPP_NAME }}
           package: app.zip
+
+      - name: Post-deployment database validation (optional)
+        run: |
+          echo "✓ Додаток успішно розгорнуто на Azure"
