@@ -37,13 +37,8 @@ swagger_config = {
 swagger_template = {
     "swagger": "2.0",
     "info": {
-<<<<<<< Updated upstream:cursor-try-2/app.py
         "title": "BugHunter API",
-        "description": "API documentation for BugHunter application",
-=======
-        "title": "API BugHunter",
         "description": "Документація API для порталу BugHunter",
->>>>>>> Stashed changes:app.py
         "version": "1.0.0"
     },
     "securityDefinitions": {
