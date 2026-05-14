@@ -5,8 +5,8 @@
 {% block content %}
 <div class="test-cases-list">
     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
-        <h1>Test Cases</h1>
-        <a href="/test-cases/new" class="btn btn-primary">Create New Test Case</a>
+        <h1>Тестові сценарії</h1>
+        <a href="/test-cases/new" class="btn btn-primary">Створити новий тестовий сценарій</a>
     </div>
     
     <div class="card">
@@ -14,15 +14,15 @@
             <thead>
                 <tr>
                     <th>ID</th>
-                    <th>Title</th>
-                    <th>Priority</th>
-                    <th>Application Group</th>
-                    <th>Version</th>
-                    <th>Actions</th>
+                    <th>Назва</th>
+                    <th>Пріоритет</th>
+                    <th>Застосунок</th>
+                    <th>Версія</th>
+                    <th>Дії</th>
                 </tr>
             </thead>
             <tbody id="test-cases-table">
-                <tr><td colspan="6">Loading...</td></tr>
+                <tr><td colspan="6">Завантаження...</td></tr>
             </tbody>
         </table>
     </div>
@@ -42,7 +42,7 @@ function loadTestCases() {
     .then(data => {
         const tbody = document.getElementById('test-cases-table');
         if (data.length === 0) {
-            tbody.innerHTML = '<tr><td colspan="6">No test cases found</td></tr>';
+            tbody.innerHTML = '<tr><td colspan="6">Тестові сценарії не знайдені</td></tr>';
             return;
         }
         

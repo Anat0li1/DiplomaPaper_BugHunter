@@ -4,10 +4,10 @@
 
 {% block content %}
 <div class="orders">
-    <h1>My Orders</h1>
+    <h1>Мої замовлення</h1>
     
     <div class="card" id="orders-list">
-        <p>Loading...</p>
+        <p>Завантаження...</p>
     </div>
 </div>
 
@@ -24,15 +24,15 @@ function loadOrders() {
     .then(orders => {
         const container = document.getElementById('orders-list');
         if (orders.length === 0) {
-            container.innerHTML = '<p>No orders found</p>';
+            container.innerHTML = '<p>Замовлень не знайдено</p>';
             return;
         }
         
         container.innerHTML = orders.map(order => `
             <div style="border-bottom: 1px solid #eee; padding: 1.5rem 0;">
                 <div style="display: flex; justify-content: space-between; margin-bottom: 1rem;">
-                    <h3>Order #${order.id.substring(0, 8)}</h3>
-                    <p><strong>Total: $${order.total_amount}</strong></p>
+                    <h3>Замовлення #${order.id.substring(0, 8)}</h3>
+                    <p><strong>Всього: $${order.total_amount}</strong></p>
                     <p>${new Date(order.created_at).toLocaleString()}</p>
                 </div>
                 <ul>

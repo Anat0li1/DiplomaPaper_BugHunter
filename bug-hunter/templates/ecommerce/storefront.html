@@ -63,46 +63,46 @@
 {% block content %}
 <div class="storefront">
     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
-        <h1>Storefront</h1>
-        <a href="/shop-admin" class="btn btn-primary">Switch to Admin View</a>
+        <h1>Вітрина</h1>
+        <a href="/shop-admin" class="btn btn-primary">Перейти до адміністратора</a>
     </div>
     
     <div class="filters">
         <div class="filter-group">
-            <label>Sort By</label>
+            <label>Сортувати за</label>
             <select id="sort-by">
-                <option value="newest">Newest</option>
-                <option value="oldest">Oldest</option>
-                <option value="price_low">Price: Low to High</option>
-                <option value="price_high">Price: High to Low</option>
-                <option value="name_asc">Name: A to Z</option>
-                <option value="name_desc">Name: Z to A</option>
+                <option value="newest">Найновіші</option>
+                <option value="oldest">Найстаріші</option>
+                <option value="price_low">Ціна: від низької до високої</option>
+                <option value="price_high">Ціна: від високої до низької</option>
+                <option value="name_asc">Назва: А до Я</option>
+                <option value="name_desc">Назва: Я до А</option>
             </select>
         </div>
         
         <div class="filter-group">
-            <label>Category</label>
+            <label>Категорія</label>
             <select id="category-filter" multiple style="min-width: 150px;">
             </select>
         </div>
         
         <div class="filter-group">
-            <label>Min Price</label>
+            <label>Мінімальна ціна</label>
             <input type="number" id="price-min" step="0.01" min="0">
         </div>
         
         <div class="filter-group">
-            <label>Max Price</label>
+            <label>Максимальна ціна</label>
             <input type="number" id="price-max" step="0.01" min="0">
         </div>
         
         <div class="filter-group" style="justify-content: flex-end;">
-            <button class="btn btn-secondary" onclick="applyFilters()">Apply Filters</button>
+            <button class="btn btn-secondary" onclick="applyFilters()">Застосувати фільтри</button>
         </div>
     </div>
     
     <div class="product-grid" id="product-grid">
-        <p>Loading products...</p>
+        <p>Завантаження товарів...</p>
     </div>
 </div>
 
@@ -166,23 +166,23 @@ function loadProducts() {
     .then(products => {
         const grid = document.getElementById('product-grid');
         if (products.length === 0) {
-            grid.innerHTML = '<p>No products found</p>';
+            grid.innerHTML = '<p>Товари не знайдені</p>';
             return;
         }
         
         grid.innerHTML = products.map(product => `
             <div class="product-card" onclick="window.location.href='/product/${product.id}'">
-                ${product.image_url ? `<img src="${product.image_url}" alt="${product.name}">` : '<div style="height: 200px; background: #eee; display: flex; align-items: center; justify-content: center; margin-bottom: 1rem;">No Image</div>'}
+                ${product.image_url ? `<img src="${product.image_url}" alt="${product.name}">` : '<div style="height: 200px; background: #eee; display: flex; align-items: center; justify-content: center; margin-bottom: 1rem;">Немає зображення</div>'}
                 <h3>${product.name}</h3>
                 <p style="color: #666; margin: 0.5rem 0;">${product.description ? product.description.substring(0, 100) + '...' : ''}</p>
                 <p style="font-size: 1.25rem; font-weight: bold; color: #27ae60;">$${product.price}</p>
-                <p style="color: #999; font-size: 0.875rem;">Stock: ${product.quantity}</p>
+                <p style="color: #999; font-size: 0.875rem;">Залишок: ${product.quantity}</p>
             </div>
         `).join('');
     })
     .catch(err => {
         console.error('Error loading products:', err);
-        showAlert('Failed to load products', 'error');
+        showAlert('Помилка завантаження товарів', 'error');
     });
 }
 

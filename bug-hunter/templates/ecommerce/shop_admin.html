@@ -5,50 +5,50 @@
 {% block content %}
 <div class="shop-admin">
     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
-        <h1>Shop Administration</h1>
-        <a href="/storefront" class="btn btn-primary">Switch to Storefront</a>
+        <h1>Адміністрування магазину</h1>
+        <a href="/storefront" class="btn btn-primary">Перейти до вітрини</a>
     </div>
     
     <div class="tabs" style="border-bottom: 2px solid #eee; margin-bottom: 2rem;">
-        <button class="tab-btn active" onclick="switchTab('info')">Shop Info</button>
-        <button class="tab-btn" onclick="switchTab('products')">Manage Products</button>
+        <button class="tab-btn active" onclick="switchTab('info')">Інформація про магазин</button>
+        <button class="tab-btn" onclick="switchTab('products')">Управління товарами</button>
     </div>
     
     <div id="tab-info" class="tab-content">
         <div class="card">
-            <h2>Shop Information</h2>
+            <h2>Інформація про магазин</h2>
             <form id="shop-info-form">
                 <div class="form-group">
-                    <label>Shop Name</label>
+                    <label>Назва магазину</label>
                     <input type="text" id="shop-name" required>
                 </div>
                 <div class="form-group">
-                    <label>Description</label>
+                    <label>Опис</label>
                     <textarea id="shop-description" rows="4"></textarea>
                 </div>
-                <button type="submit" class="btn btn-primary">Update Shop</button>
+                <button type="submit" class="btn btn-primary">Оновити магазин</button>
             </form>
         </div>
     </div>
     
     <div id="tab-products" class="tab-content" style="display: none;">
         <div style="margin-bottom: 2rem;">
-            <button class="btn btn-primary" onclick="showProductModal()">Add New Product</button>
+            <button class="btn btn-primary" onclick="showProductModal()">Додати новий товар</button>
         </div>
         
         <div class="card">
             <table class="table">
                 <thead>
                     <tr>
-                        <th>Name</th>
-                        <th>Category</th>
-                        <th>Price</th>
-                        <th>Quantity</th>
-                        <th>Actions</th>
+                        <th>Назва</th>
+                        <th>Категорія</th>
+                        <th>Ціна</th>
+                        <th>Кількість</th>
+                        <th>Дії</th>
                     </tr>
                 </thead>
                 <tbody id="products-table">
-                    <tr><td colspan="5">Loading...</td></tr>
+                    <tr><td colspan="5">Завантаження...</td></tr>
                 </tbody>
             </table>
         </div>
@@ -58,37 +58,37 @@
 <!-- Product Modal -->
 <div id="product-modal" class="modal">
     <div class="modal-content">
-        <h2 id="modal-title">Add Product</h2>
+        <h2 id="modal-title">Додати товар</h2>
         <form id="product-form">
             <input type="hidden" id="product-id">
             <div class="form-group">
-                <label>Name *</label>
+                <label>Назва *</label>
                 <input type="text" id="product-name" required>
             </div>
             <div class="form-group">
-                <label>Description</label>
+                <label>Опис</label>
                 <textarea id="product-description" rows="3"></textarea>
             </div>
             <div class="form-group">
-                <label>Price *</label>
+                <label>Ціна *</label>
                 <input type="number" id="product-price" step="0.01" min="0" required>
             </div>
             <div class="form-group">
-                <label>Quantity *</label>
+                <label>Кількість *</label>
                 <input type="number" id="product-quantity" min="0" required>
             </div>
             <div class="form-group">
-                <label>Image URL</label>
+                <label>URL зображення</label>
                 <input type="url" id="product-image">
             </div>
             <div class="form-group">
-                <label>Category</label>
+                <label>Категорія</label>
                 <input type="text" id="product-category" list="category-list">
                 <datalist id="category-list"></datalist>
             </div>
             <div style="display: flex; gap: 1rem; margin-top: 1rem;">
-                <button type="submit" class="btn btn-primary">Save</button>
-                <button type="button" class="btn btn-secondary" onclick="closeProductModal()">Cancel</button>
+                <button type="submit" class="btn btn-primary">Зберегти</button>
+                <button type="button" class="btn btn-secondary" onclick="closeProductModal()">Скасувати</button>
             </div>
         </form>
     </div>

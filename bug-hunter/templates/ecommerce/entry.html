@@ -4,8 +4,8 @@
 
 {% block content %}
 <div class="card">
-    <h1>Loading your shop...</h1>
-    <p id="entry-status">Checking if you already have a store configured.</p>
+    <h1>Завантаження вашого магазину...</h1>
+    <p id="entry-status">Перевірка, чи у вас уже налаштований магазин.</p>
 </div>
 {% endblock %}
 
@@ -22,10 +22,10 @@ document.addEventListener('DOMContentLoaded', async () => {
             window.location.href = '/create-shop';
             return;
         }
-        document.getElementById('entry-status').textContent = 'Unable to load shop information. Please try again.';
+        document.getElementById('entry-status').textContent = 'Неможливо завантажити інформацію про магазин. Спробуйте ще раз.';
     } catch (error) {
         console.error('Error checking shop:', error);
-        document.getElementById('entry-status').textContent = 'Unable to load shop information. Please try again.';
+        document.getElementById('entry-status').textContent = 'Неможливо завантажити інформацію про магазин. Спробуйте ще раз.';
     }
 });
 </script>

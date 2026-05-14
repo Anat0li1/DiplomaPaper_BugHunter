@@ -66,30 +66,30 @@
 {% block content %}
 <div class="kanban-view">
     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
-        <h1 id="board-title">Loading...</h1>
+        <h1 id="board-title">Завантаження...</h1>
         <div>
-            <button class="btn btn-secondary" onclick="showCreateColumnModal()">Add Column</button>
-            <button class="btn btn-secondary" onclick="window.location.href='/task-tracker'">Back to Boards</button>
+            <button class="btn btn-secondary" onclick="showCreateColumnModal()">Додати колону</button>
+            <button class="btn btn-secondary" onclick="window.location.href='/task-tracker'">Назад до дошок</button>
         </div>
     </div>
     
     <div class="kanban-board" id="kanban-board">
-        <p>Loading...</p>
+        <p>Завантаження...</p>
     </div>
 </div>
 
 <!-- Create Column Modal -->
 <div id="create-column-modal" class="modal">
     <div class="modal-content">
-        <h2>Create New Column</h2>
+        <h2>Створити нову колону</h2>
         <form id="create-column-form">
             <div class="form-group">
-                <label>Column Title *</label>
+                <label>Назва колони *</label>
                 <input type="text" id="column-title" required>
             </div>
             <div style="display: flex; gap: 1rem; margin-top: 1rem;">
-                <button type="submit" class="btn btn-primary">Create</button>
-                <button type="button" class="btn btn-secondary" onclick="closeCreateColumnModal()">Cancel</button>
+                <button type="submit" class="btn btn-primary">Створити</button>
+                <button type="button" class="btn btn-secondary" onclick="closeCreateColumnModal()">Скасувати</button>
             </div>
         </form>
     </div>

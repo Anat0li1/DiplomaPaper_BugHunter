@@ -74,44 +74,44 @@ iframe {
 
 {% block content %}
 <div class="ui-playground">
-    <h1>UI Automation Playground</h1>
-    <p>Comprehensive collection of UI elements for automation testing practice</p>
+    <h1>Полігон UI автоматизації</h1>
+    <p>Комплексна колекція елементів UI для практики тестування автоматизації</p>
     
     <!-- Text Fields -->
     <div class="playground-section">
-        <h2>Text Fields</h2>
+        <h2>Текстові поля</h2>
         <div class="element-group">
-            <label>Normal Text Field</label>
-            <input type="text" placeholder="Enter text here" class="form-control">
+            <label>Звичайне текстове поле</label>
+            <input type="text" placeholder="Введіть текст тут" class="form-control">
         </div>
         <div class="element-group">
-            <label>Disabled Text Field</label>
-            <input type="text" value="Disabled field" disabled>
+            <label>Недоступне текстове поле</label>
+            <input type="text" value="Недоступне поле" disabled>
         </div>
         <div class="element-group">
-            <label>Prefilled Text Field</label>
-            <input type="text" value="This field is prefilled">
+            <label>Заповнене текстове поле</label>
+            <input type="text" value="Це поле попередньо заповнено">
         </div>
         <div class="element-group">
-            <label>Hidden Text Field</label>
-            <input type="text" id="hidden-field" class="hidden-element" value="Hidden value">
-            <button class="btn btn-secondary" onclick="toggleHidden()">Toggle Hidden Field</button>
+            <label>Приховане текстове поле</label>
+            <input type="text" id="hidden-field" class="hidden-element" value="Приховане значення">
+            <button class="btn btn-secondary" onclick="toggleHidden()">Перемкнути приховане поле</button>
         </div>
         <div class="element-group">
-            <label>Delayed Appearance Text Field</label>
-            <input type="text" id="delayed-field" class="delayed-element" placeholder="This field appears after 5 seconds">
+            <label></label>Текстове поле з затримкою</label>
+            <input type="text" id="delayed-field" class="delayed-element" placeholder="Це поле з'явиться через 5 секунд">
         </div>
     </div>
     
     <!-- Buttons -->
     <div class="playground-section">
-        <h2>Buttons</h2>
+        <h2>Кнопки</h2>
         <div class="element-group">
-            <button class="btn btn-primary" onclick="buttonClicked('Normal Button')">Normal Button</button>
-            <button class="btn btn-secondary" disabled>Disabled Button</button>
-            <button class="btn btn-success" id="delayed-btn" class="delayed-element" onclick="buttonClicked('Delayed Button')">Delayed Button (5s)</button>
-            <button class="btn btn-danger" id="hidden-btn" style="display: none;" onclick="buttonClicked('Hidden Button')">Hidden Button</button>
-            <button class="btn btn-secondary" onclick="toggleButton()">Toggle Hidden Button</button>
+            <button class="btn btn-primary" onclick="buttonClicked('Normal Button')">Звичайна кнопка</button>
+            <button class="btn btn-secondary" disabled>Відключена кнопка</button>
+            <button class="btn btn-success" id="delayed-btn" class="delayed-element" onclick="buttonClicked('Delayed Button')">Кнопка з затримкою (5s)</button>
+            <button class="btn btn-danger" id="hidden-btn" style="display: none;" onclick="buttonClicked('Hidden Button')">Прихована кнопка</button>
+            <button class="btn btn-secondary" onclick="toggleButton()">Перемкнути приховану кнопку</button>
         </div>
         <div id="button-clicks" style="margin-top: 1rem; padding: 1rem; background: #f0f0f0; border-radius: 4px;">
             <strong>Button Clicks:</strong> <span id="click-count">0</span>
@@ -120,48 +120,48 @@ iframe {
     
     <!-- Checkboxes -->
     <div class="playground-section">
-        <h2>Checkboxes</h2>
+        <h2>Прапорці</h2>
         <div class="element-group">
-            <label><input type="checkbox" value="option1"> Option 1</label>
-            <label><input type="checkbox" value="option2"> Option 2</label>
-            <label><input type="checkbox" value="option3"> Option 3</label>
+            <label><input type="checkbox" value="option1"> Прапорець 1</label>
+            <label><input type="checkbox" value="option2"> Прапорець 2</label>
+            <label><input type="checkbox" value="option3"> Прапорець 3</label>
         </div>
         <div class="element-group">
-            <label><input type="checkbox" id="single-checkbox"> Single Checkbox</label>
+            <label><input type="checkbox" id="single-checkbox"> Одиничний прапорець</label>
         </div>
     </div>
     
     <!-- Radio Groups -->
     <div class="playground-section">
-        <h2>Radio Groups</h2>
+        <h2>Групи радіо-кнопок</h2>
         <div class="element-group">
-            <label><input type="radio" name="radio-group" value="option1"> Option 1</label>
-            <label><input type="radio" name="radio-group" value="option2"> Option 2</label>
-            <label><input type="radio" name="radio-group" value="option3"> Option 3</label>
+            <label><input type="radio" name="radio-group" value="option1"> Пункт 1</label>
+            <label><input type="radio" name="radio-group" value="option2"> Пункт 2</label>
+            <label><input type="radio" name="radio-group" value="option3"> Пункт 3</label>
         </div>
     </div>
     
     <!-- Dropdowns -->
     <div class="playground-section">
-        <h2>Dropdowns</h2>
+        <h2>Списки</h2>
         <div class="element-group">
-            <label>Simple Dropdown</label>
+            <label>Простий список</label>
             <select>
-                <option>Option 1</option>
-                <option>Option 2</option>
-                <option>Option 3</option>
+                <option>Пункт 1</option>
+                <option>Пункт 2</option>
+                <option>Пункт 3</option>
             </select>
         </div>
         <div class="element-group">
-            <label>Advanced Dropdown (with groups)</label>
+            <label>Список з групами</label>
             <select>
-                <optgroup label="Group 1">
-                    <option>Item 1.1</option>
-                    <option>Item 1.2</option>
+                <optgroup label="Група 1">
+                    <option>Елемент 1.1</option>
+                    <option>Елемент 1.2</option>
                 </optgroup>
-                <optgroup label="Group 2">
-                    <option>Item 2.1</option>
-                    <option>Item 2.2</option>
+                <optgroup label="Група 2">
+                    <option>Елемент 2.1</option>
+                    <option>Елемент 2.2</option>
                 </optgroup>
             </select>
         </div>
@@ -169,15 +169,15 @@ iframe {
     
     <!-- Multi-select -->
     <div class="playground-section">
-        <h2>Multi-select</h2>
+        <h2>Мульти-вибір</h2>
         <div class="element-group">
-            <label>Multi-select Dropdown</label>
+            <label>Мульти-вибір</label>
             <select multiple style="height: 100px;">
-                <option>Option 1</option>
-                <option>Option 2</option>
-                <option>Option 3</option>
-                <option>Option 4</option>
-                <option>Option 5</option>
+                <option>Пункт 1</option>
+                <option>Пункт 2</option>
+                <option>Пункт 3</option>
+                <option>Пункт 4</option>
+                <option>Пункт 5</option>
             </select>
         </div>
     </div>
@@ -187,11 +187,11 @@ iframe {
         <h2>iFrames</h2>
         <div class="iframe-container">
             <div>
-                <h3>Example 1: External Page</h3>
+                <h3>Приклад 1: Зовнішня сторінка</h3>
                 <iframe src="https://example.com"></iframe>
             </div>
             <div>
-                <h3>Example 2: Another External Page</h3>
+                <h3>Приклад 2: Ще одна зовнішня сторінка</h3>
                 <iframe src="https://httpbin.org/html"></iframe>
             </div>
         </div>
@@ -199,32 +199,32 @@ iframe {
     
     <!-- Data Tables -->
     <div class="playground-section">
-        <h2>Dynamic/Sortable Data Tables</h2>
+        <h2>Таблиці даних</h2>
         <table class="table sortable-table" id="data-table">
             <thead>
                 <tr>
-                    <th onclick="sortTable(0)">Name ↕</th>
-                    <th onclick="sortTable(1)">Age ↕</th>
-                    <th onclick="sortTable(2)">City ↕</th>
+                    <th onclick="sortTable(0)">Ім'я ↕</th>
+                    <th onclick="sortTable(1)">Вік ↕</th>
+                    <th onclick="sortTable(2)">Місто ↕</th>
                 </tr>
             </thead>
             <tbody>
-                <tr><td>Alice</td><td>25</td><td>New York</td></tr>
-                <tr><td>Bob</td><td>30</td><td>London</td></tr>
-                <tr><td>Charlie</td><td>22</td><td>Tokyo</td></tr>
-                <tr><td>Diana</td><td>28</td><td>Paris</td></tr>
+                <tr><td>Аліса</td><td>25</td><td>Нью-Йорк</td></tr>
+                <tr><td>Боб</td><td>30</td><td>Лондон</td></tr>
+                <tr><td>Чарлі</td><td>22</td><td>Токіо</td></tr>
+                <tr><td>Діана</td><td>28</td><td>Париж</td></tr>
             </tbody>
         </table>
     </div>
     
     <!-- Modal Dialogs -->
     <div class="playground-section">
-        <h2>Modal Dialogs</h2>
-        <button class="btn btn-primary" onclick="showModal()">Open Modal</button>
+        <h2>Модальні вікна</h2>
+        <button class="btn btn-primary" onclick="showModal()">Відкрити модальне вікно</button>
         <div id="test-modal" class="modal">
             <div class="modal-content">
-                <h2>Test Modal</h2>
-                <p>This is a modal dialog for testing.</p>
+                <h2>Тестове модальне вікно</h2>
+                <p>Це тестове модальне вікно.</p>
                 <button class="btn btn-secondary" onclick="closeModal()">Close</button>
             </div>
         </div>
@@ -232,47 +232,47 @@ iframe {
     
     <!-- Sliders -->
     <div class="playground-section">
-        <h2>Sliders</h2>
+        <h2>Слайдери</h2>
         <div class="element-group">
-            <label>Range Slider: <span id="slider-value">50</span></label>
+            <label>Слайдер проміжку: <span id="slider-value">50</span></label>
             <input type="range" min="0" max="100" value="50" oninput="document.getElementById('slider-value').textContent = this.value">
         </div>
     </div>
     
     <!-- Date Pickers -->
     <div class="playground-section">
-        <h2>Date Pickers</h2>
+        <h2>Підбор дат</h2>
         <div class="element-group">
-            <label>Date Picker</label>
+            <label>Підбір дати</label>
             <input type="date">
         </div>
         <div class="element-group">
-            <label>Time Picker</label>
+            <label>Підбір часу</label>
             <input type="time">
         </div>
         <div class="element-group">
-            <label>DateTime Picker</label>
+            <label>Підбір дати та часу</label>
             <input type="datetime-local">
         </div>
     </div>
     
     <!-- Other Components -->
     <div class="playground-section">
-        <h2>Other UI Components</h2>
+        <h2>Інші компоненти інтерфейсу</h2>
         <div class="element-group">
-            <label>File Upload</label>
+            <label>Завантаження файлів</label>
             <input type="file">
         </div>
         <div class="element-group">
-            <label>Color Picker</label>
+            <label>Підбір кольору</label>
             <input type="color" value="#3498db">
         </div>
         <div class="element-group">
-            <label>Progress Bar</label>
+            <label>Прогрес-панель</label>
             <progress value="60" max="100">60%</progress>
         </div>
         <div class="element-group">
-            <label>Textarea</label>
+            <label>Багатолінійне поле вводу</label>
             <textarea rows="4" placeholder="Enter multiline text"></textarea>
         </div>
     </div>

@@ -4,100 +4,100 @@
 
 {% block content %}
 <div class="bug-report-form">
-    <h1>{% if bug_report_id %}Edit{% else %}Create New{% endif %} Bug Report</h1>
+    <h1>{% if bug_report_id %}Редагування{% else %}Створення нового{% endif %} звіту про помилку</h1>
     
     <div class="card">
         <form id="bug-report-form">
             <div class="form-group">
-                <label>Title *</label>
+                <label>Назва *</label>
                 <input type="text" id="title" name="title" required>
             </div>
             
             <div class="form-group">
-                <label>Description</label>
+                <label>Опис</label>
                 <textarea id="description" name="description" rows="4"></textarea>
             </div>
             
             <div class="form-group">
-                <label>Preconditions</label>
+                <label>Передумови</label>
                 <textarea id="preconditions" name="preconditions" rows="3"></textarea>
             </div>
             
             <div class="form-group">
-                <label>Postconditions</label>
+                <label>Постумови</label>
                 <textarea id="postconditions" name="postconditions" rows="3"></textarea>
             </div>
             
             <div class="form-group">
-                <label>Actual Result</label>
+                <label>Фактичний результат</label>
                 <textarea id="actual_result" name="actual_result" rows="3"></textarea>
             </div>
             
             <div class="form-group">
-                <label>Expected Result</label>
+                <label>Очікуваний результат</label>
                 <textarea id="expected_result" name="expected_result" rows="3"></textarea>
             </div>
             
             <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
                 <div class="form-group">
-                    <label>Severity</label>
+                    <label>Важливість</label>
                     <select id="severity" name="severity">
-                        <option value="Critical">Critical</option>
-                        <option value="High">High</option>
-                        <option value="Medium" selected>Medium</option>
-                        <option value="Low">Low</option>
+                        <option value="Critical">Критична</option>
+                        <option value="High">Висока</option>
+                        <option value="Medium" selected>Середня</option>
+                        <option value="Low">Низька</option>
                     </select>
                 </div>
                 
                 <div class="form-group">
-                    <label>Priority</label>
+                    <label>Пріоритет</label>
                     <select id="priority" name="priority">
-                        <option value="High">High</option>
-                        <option value="Medium" selected>Medium</option>
-                        <option value="Low">Low</option>
+                        <option value="High">Високий</option>
+                        <option value="Medium" selected>Середній</option>
+                        <option value="Low">Низький</option>
                     </select>
                 </div>
             </div>
             
             <div class="form-group">
-                <label>Status</label>
+                <label>Статус</label>
                 <select id="status" name="status">
-                    <option value="New" selected>New</option>
-                    <option value="In Progress">In Progress</option>
-                    <option value="Closed">Closed</option>
-                    <option value="Won't Fix">Won't Fix</option>
+                    <option value="New" selected>Новий</option>
+                    <option value="In Progress">В процесі</option>
+                    <option value="Closed">Закритий</option>
+                    <option value="Won't Fix">Не буде виправлятись</option>
                 </select>
             </div>
             
             <div class="form-group">
-                <label>System and Browser Info</label>
+                <label>Інформація про систему та браузер</label>
                 <input type="text" id="system_and_browser_inf" name="system_and_browser_inf">
             </div>
             
             <div class="form-group">
-                <label>Version</label>
+                <label>Версія</label>
                 <input type="text" id="version" name="version">
             </div>
             
             <div class="form-group">
-                <label>Environment</label>
+                <label>Середовище</label>
                 <input type="text" id="environment" name="environment">
             </div>
             
             <div class="form-group">
-                <label>Test Case Given ID</label>
-                <input type="text" id="test_case_given_id" name="test_case_given_id" placeholder="ID of related test case">
+                <label>Id пов'язаного тестового сценарію</label>
+                <input type="text" id="test_case_given_id" name="test_case_given_id" placeholder="ID пов'язаного тестового сценарію">
             </div>
             
             <div class="form-group">
-                <label>Comments</label>
+                <label>Коментарі</label>
                 <textarea id="comments" name="comments" rows="3"></textarea>
             </div>
             
             <div class="form-group">
-                <label>Reproducing Steps</label>
+                <label>Кроки відтворення</label>
                 <div id="steps-container"></div>
-                <button type="button" class="btn btn-secondary" onclick="addStep()">Add Step</button>
+                <button type="button" class="btn btn-secondary" onclick="addStep()">Додати крок</button>
             </div>
             
             <div style="display: flex; gap: 1rem; margin-top: 2rem;">

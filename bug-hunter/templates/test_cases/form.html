@@ -4,74 +4,74 @@
 
 {% block content %}
 <div class="test-case-form">
-    <h1>{% if test_case_id %}Edit{% else %}Create New{% endif %} Test Case</h1>
+    <h1>{% if test_case_id %}Редагування{% else %}Створення нового{% endif %} тестового сценарію</h1>
     
     <div class="card">
         <form id="test-case-form">
             <div class="form-group">
-                <label>Given ID</label>
-                <input type="text" id="given_id" name="given_id" placeholder="Optional custom ID">
+                <label>Заданий ID</label>
+                <input type="text" id="given_id" name="given_id" placeholder="Необов'язковий користувальницький ID">
             </div>
             
             <div class="form-group">
-                <label>Application Group</label>
+                <label>Тип застосунку</label>
                 <input type="text" id="application_group" name="application_group">
             </div>
             
             <div class="form-group">
-                <label>Title *</label>
+                <label>Назва *</label>
                 <input type="text" id="title" name="title" required>
             </div>
             
             <div class="form-group">
-                <label>Description</label>
+                <label>Опис</label>
                 <textarea id="description" name="description" rows="4"></textarea>
             </div>
             
             <div class="form-group">
-                <label>Priority</label>
+                <label>Пріоритет</label>
                 <select id="priority" name="priority">
-                    <option value="1">High</option>
-                    <option value="2" selected>Medium</option>
-                    <option value="3">Low</option>
+                    <option value="1">Високий</option>
+                    <option value="2" selected>Середній</option>
+                    <option value="3">Низький</option>
                 </select>
             </div>
             
             <div class="form-group">
-                <label>Preconditions</label>
+                <label>Передумови</label>
                 <textarea id="preconditions" name="preconditions" rows="3"></textarea>
             </div>
             
             <div class="form-group">
-                <label>Postconditions</label>
+                <label>Постумови</label>
                 <textarea id="postconditions" name="postconditions" rows="3"></textarea>
             </div>
             
             <div class="form-group">
-                <label>Version</label>
+                <label>Версія</label>
                 <input type="text" id="version" name="version">
             </div>
             
             <div class="form-group">
-                <label>Environment</label>
+                <label>Середовище</label>
                 <input type="text" id="environment" name="environment">
             </div>
             
             <div class="form-group">
-                <label>Comments</label>
+                <label>Коментарі</label>
                 <textarea id="comments" name="comments" rows="3"></textarea>
             </div>
             
             <div class="form-group">
-                <label>Test Steps</label>
+                <label>Кроки тестування</label>
                 <div id="steps-container"></div>
-                <button type="button" class="btn btn-secondary" onclick="addStep()">Add Step</button>
-                <button type="button" class="btn btn-secondary" onclick="renumberSteps()">Renumber Steps</button>
+                <button type="button" class="btn btn-secondary" onclick="addStep()">Додати крок</button>
+                <button type="button" class="btn btn-secondary" onclick="renumberSteps()">Перепронумерувати кроки</button>
             </div>
             
             <div style="display: flex; gap: 1rem; margin-top: 2rem;">
-                <button type="submit" class="btn btn-primary">Save</button>
-                <a href="/test-cases" class="btn btn-secondary">Cancel</a>
+                <button type="submit" class="btn btn-primary">Зберегти</button>
+                <a href="/test-cases" class="btn btn-secondary">Скасувати</a>
             </div>
         </form>
     </div>

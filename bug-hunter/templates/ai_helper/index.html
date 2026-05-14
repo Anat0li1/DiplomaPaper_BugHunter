@@ -65,20 +65,20 @@
 
 {% block content %}
 <div class="ai-helper">
-    <h1>AI Helper</h1>
-    <p>Ask questions and get AI-powered assistance</p>
+    <h1>Помічник ШІ</h1>
+    <p>Ставте запитання та отримуйте допомогу з ШІ</p>
     
     <div class="chat-container">
         <div class="chat-messages" id="chat-messages">
             <div class="message ai">
-                <div class="message-header">AI Assistant</div>
-                <div>Hello! How can I help you today?</div>
+                <div class="message-header">Асистент ШІ</div>
+                <div>Привіт! Чим я можу вам допомогти сьогодні?</div>
             </div>
         </div>
         
         <div class="chat-input-container">
-            <input type="text" id="message-input" placeholder="Type your message..." onkeypress="if(event.key === 'Enter') sendMessage()">
-            <button class="btn btn-primary" onclick="sendMessage()">Send</button>
+            <input type="text" id="message-input" placeholder="Введіть ваше повідомлення..." onkeypress="if(event.key === 'Enter') sendMessage()">
+            <button class="btn btn-primary" onclick="sendMessage()">Відправити</button>
         </div>
     </div>
 </div>

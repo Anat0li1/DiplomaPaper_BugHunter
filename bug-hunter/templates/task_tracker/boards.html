@@ -5,27 +5,27 @@
 {% block content %}
 <div class="task-tracker-boards">
     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
-        <h1>Task Tracker</h1>
-        <button class="btn btn-primary" onclick="showCreateBoardModal()">Create New Board</button>
+        <h1>Трекер завдань</h1>
+        <button class="btn btn-primary" onclick="showCreateBoardModal()">Створити нову дошку</button>
     </div>
     
     <div class="grid" id="boards-grid">
-        <p>Loading boards...</p>
+        <p>Завантаження дошок...</p>
     </div>
 </div>
 
 <!-- Create Board Modal -->
 <div id="create-board-modal" class="modal">
     <div class="modal-content">
-        <h2>Create New Board</h2>
+        <h2>Створити нову дошку</h2>
         <form id="create-board-form">
             <div class="form-group">
-                <label>Board Title *</label>
+                <label>Назва дошки *</label>
                 <input type="text" id="board-title" required>
             </div>
             <div style="display: flex; gap: 1rem; margin-top: 1rem;">
-                <button type="submit" class="btn btn-primary">Create</button>
-                <button type="button" class="btn btn-secondary" onclick="closeCreateBoardModal()">Cancel</button>
+                <button type="submit" class="btn btn-primary">Створити</button>
+                <button type="button" class="btn btn-secondary" onclick="closeCreateBoardModal()">Скасувати</button>
             </div>
         </form>
     </div>
@@ -44,7 +44,7 @@ function loadBoards() {
     .then(boards => {
         const grid = document.getElementById('boards-grid');
         if (boards.length === 0) {
-            grid.innerHTML = '<p>No boards found. Create your first board!</p>';
+            grid.innerHTML = '<p>Дошок не знайдено. Створіть вашу першу дошку!</p>';
             return;
         }
         
@@ -52,8 +52,8 @@ function loadBoards() {
             <div class="card" style="cursor: pointer;" onclick="window.location.href='/task-tracker/board/${board.id}'">
                 <h2>${board.title}</h2>
                 <div style="margin-top: 1rem;">
-                    <button class="btn btn-primary" style="padding: 0.25rem 0.75rem; font-size: 0.875rem;" onclick="event.stopPropagation(); editBoard('${board.id}', '${board.title}')">Edit</button>
-                    <button class="btn btn-danger" style="padding: 0.25rem 0.75rem; font-size: 0.875rem;" onclick="event.stopPropagation(); deleteBoard('${board.id}')">Delete</button>
+                    <button class="btn btn-primary" style="padding: 0.25rem 0.75rem; font-size: 0.875rem;" onclick="event.stopPropagation(); editBoard('${board.id}', '${board.title}')">Редагувати</button>
+                    <button class="btn btn-danger" style="padding: 0.25rem 0.75rem; font-size: 0.875rem;" onclick="event.stopPropagation(); deleteBoard('${board.id}')">Видалити</button>
                 </div>
             </div>
         `).join('');
@@ -86,7 +86,7 @@ function editBoard(id, title) {
 }
 
 function deleteBoard(id) {
-    if (!confirm('Are you sure you want to delete this board?')) return;
+    if (!confirm('Ви впевнені, що хочете видалити цю дошку?')) return;
     
     fetch(`/api/boards/${id}`, {
         method: 'DELETE',
