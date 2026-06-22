@@ -1,74 +1,80 @@
-# BugHunter - Full-Stack QA Management Portal
+# BugHunter — Повнофункціональний портал управління QA
 
-A comprehensive full-stack application for QA management, testing, and development tools.
+Комплексний full-stack застосунок для управління QA, тестування та інструментів розробки.
 
-## Features
+## Можливості
 
-- **Authentication System**: JWT-based authentication with user management
-- **QA Tools**: Test Case Manager and Bug Report Manager
-- **E-commerce Sandbox**: Personal shop management with products, cart, and orders
-- **UI Playground**: Comprehensive collection of UI elements for automation testing
-- **Task Tracker**: Kanban-style board for project management
-- **AI Helper**: Chat interface for AI-powered assistance
+* **Система автентифікації**: автентифікація на основі JWT з керуванням користувачами
+* **QA-інструменти**: менеджер тест-кейсів та менеджер звітів про помилки
+* **Пісочниця електронної комерції**: керування власним магазином, товарами, кошиком і замовленнями
+* **UI Playground**: велика колекція елементів інтерфейсу для тестування автоматизації
+* **Трекер завдань**: дошка в стилі Kanban для керування проєктами
+* **AI-помічник**: чат-інтерфейс для отримання допомоги на основі штучного інтелекту
 
-## Tech Stack
+## Технологічний стек
 
-- **Backend**: Flask, SQLAlchemy, Flask-JWT-Extended, Alembic
-- **Database**: PostgreSQL
-- **Frontend**: HTML, CSS, JavaScript (vanilla)
-- **Deployment**: Docker, Docker Compose, Nginx
+* **Бекенд**: Flask, SQLAlchemy, Flask-JWT-Extended, Alembic
+* **База даних**: PostgreSQL
+* **Фронтенд**: HTML, CSS, JavaScript (без фреймворків)
+* **Розгортання**: Docker, Docker Compose, Nginx
 
-## Setup
+## Налаштування
 
-### Prerequisites
+### Попередні вимоги
 
-- Python 3.11+
-- PostgreSQL 15+
-- Docker and Docker Compose (for containerized deployment)
+* Python 3.11+
+* PostgreSQL 15+
+* Docker та Docker Compose (для контейнеризованого розгортання)
 
-### Local Development
+### Локальна розробка
 
-1. Clone the repository
-2. Install dependencies:
+1. Клонуйте репозиторій.
+
+2. Встановіть залежності:
+
    ```bash
    pip install -r requirements.txt
    ```
 
-3. Set up environment variables:
+3. Налаштуйте змінні середовища:
+
    ```bash
    cp .env.example .env
-   # Edit .env with your configuration
+   # Відредагуйте .env відповідно до вашої конфігурації
    ```
 
-4. Initialize the database:
+4. Ініціалізуйте базу даних:
+
    ```bash
    alembic upgrade head
    ```
 
-5. Run the application:
+5. Запустіть застосунок:
+
    ```bash
    python app.py
    ```
 
-6. Access the application at `http://localhost:5000`
+6. Відкрийте застосунок за адресою `http://localhost:5000`
 
-### Docker Deployment
+### Розгортання через Docker
 
-1. Build and start containers:
+1. Зберіть та запустіть контейнери:
+
    ```bash
    docker-compose up -d
    ```
 
-2. Access the application at `http://localhost`
+2. Відкрийте застосунок за адресою `http://localhost`
 
-## Project Structure
+## Структура проєкту
 
-```
+```text
 .
-├── app.py                 # Main Flask application
-├── models.py              # SQLAlchemy models
-├── utils.py               # Utility functions
-├── blueprints/            # Flask blueprints
+├── app.py                 # Основний застосунок Flask
+├── models.py              # Моделі SQLAlchemy
+├── utils.py               # Допоміжні функції
+├── blueprints/            # Flask Blueprint-модулі
 │   ├── auth.py
 │   ├── dashboard.py
 │   ├── test_cases.py
@@ -77,68 +83,73 @@ A comprehensive full-stack application for QA management, testing, and developme
 │   ├── ui_playground.py
 │   ├── task_tracker.py
 │   └── ai_helper.py
-├── templates/             # Jinja2 templates
-├── static/                # Static files (CSS, JS)
-├── migrations/            # Alembic migrations
+├── templates/             # Шаблони Jinja2
+├── static/                # Статичні файли (CSS, JS)
+├── migrations/            # Міграції Alembic
 ├── Dockerfile
 ├── docker-compose.yml
 └── nginx.conf
 ```
 
-## API Endpoints
+## API-ендпоінти
 
-### Authentication
-- `POST /api/auth/register` - Register new user
-- `POST /api/auth/login` - Login
-- `GET /api/auth/user` - Get current user
-- `POST /api/auth/logout` - Logout
-- `PUT /api/auth/update` - Update user
-- `POST /api/auth/change_role` - Toggle role
+### Автентифікація
 
-### Test Cases
-- `GET /api/test-cases` - List test cases
-- `GET /api/test-cases/<id>` - Get test case
-- `POST /api/test-cases` - Create test case
-- `PUT /api/test-cases/<id>` - Update test case
-- `DELETE /api/test-cases/<id>` - Delete test case
+* `POST /api/auth/register` — Реєстрація нового користувача
+* `POST /api/auth/login` — Вхід у систему
+* `GET /api/auth/user` — Отримання даних поточного користувача
+* `POST /api/auth/logout` — Вихід із системи
+* `PUT /api/auth/update` — Оновлення даних користувача
+* `POST /api/auth/change_role` — Перемикання ролі
 
-### Bug Reports
-- `GET /api/bug-reports` - List bug reports
-- `GET /api/bug-reports/<id>` - Get bug report
-- `POST /api/bug-reports` - Create bug report
-- `PUT /api/bug-reports/<id>` - Update bug report
-- `DELETE /api/bug-reports/<id>` - Delete bug report
+### Тест-кейси
 
-### E-commerce
-- `GET /api/shop` - Get shop
-- `POST /api/shop` - Create shop
-- `PUT /api/shop` - Update shop
-- `GET /api/products` - List products
-- `POST /api/products` - Create product
-- `GET /api/cart` - Get cart
-- `POST /api/cart` - Add to cart
-- `POST /api/checkout` - Checkout
-- `GET /api/orders` - List orders
+* `GET /api/test-cases` — Отримати список тест-кейсів
+* `GET /api/test-cases/<id>` — Отримати тест-кейс
+* `POST /api/test-cases` — Створити тест-кейс
+* `PUT /api/test-cases/<id>` — Оновити тест-кейс
+* `DELETE /api/test-cases/<id>` — Видалити тест-кейс
 
-### Task Tracker
-- `GET /api/boards` - List boards
-- `POST /api/boards` - Create board
-- `GET /api/boards/<id>/columns` - List columns
-- `POST /api/boards/<id>/columns` - Create column
-- `POST /api/tasks` - Create task
-- `PUT /api/tasks/<id>` - Update task
+### Звіти про помилки
 
-### AI Helper
-- `POST /api/ai/chat` - Send chat message
+* `GET /api/bug-reports` — Отримати список звітів про помилки
+* `GET /api/bug-reports/<id>` — Отримати звіт про помилку
+* `POST /api/bug-reports` — Створити звіт про помилку
+* `PUT /api/bug-reports/<id>` — Оновити звіт про помилку
+* `DELETE /api/bug-reports/<id>` — Видалити звіт про помилку
 
-## Security
+### Електронна комерція
 
-- All API endpoints (except login/register) require JWT authentication
-- Passwords are hashed using bcrypt
-- JWT tokens stored in localStorage
-- Server-side role enforcement
+* `GET /api/shop` — Отримати дані магазину
+* `POST /api/shop` — Створити магазин
+* `PUT /api/shop` — Оновити магазин
+* `GET /api/products` — Отримати список товарів
+* `POST /api/products` — Створити товар
+* `GET /api/cart` — Отримати кошик
+* `POST /api/cart` — Додати товар до кошика
+* `POST /api/checkout` — Оформити замовлення
+* `GET /api/orders` — Отримати список замовлень
 
-## License
+### Трекер завдань
+
+* `GET /api/boards` — Отримати список дощок
+* `POST /api/boards` — Створити дошку
+* `GET /api/boards/<id>/columns` — Отримати список колонок
+* `POST /api/boards/<id>/columns` — Створити колонку
+* `POST /api/tasks` — Створити завдання
+* `PUT /api/tasks/<id>` — Оновити завдання
+
+### AI-помічник
+
+* `POST /api/ai/chat` — Надіслати повідомлення в чат
+
+## Безпека
+
+* Усі API-ендпоінти (крім входу та реєстрації) вимагають JWT-автентифікації
+* Паролі хешуються за допомогою bcrypt
+* JWT-токени зберігаються в `localStorage`
+* Контроль ролей реалізований на стороні сервера
+
+## Ліцензія
 
 MIT
-
